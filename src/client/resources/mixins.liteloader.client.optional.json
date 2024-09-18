@@ -1,0 +1,11 @@
+{
+    "required": false,
+    "minVersion": "0.6.8",
+    "compatibilityLevel": "JAVA_8",
+    "target": "@env(DEFAULT)",
+    "package": "com.mumfrey.liteloader.client.mixin",
+    "refmap": "mixins.liteloader.client.refmap.json",
+    "mixins": [
+        "MixinRealmsMainScreen"
+    ]
+}

@@ -1,0 +1,33 @@
+{
+    "required": true,
+    "minVersion": "0.7.4",
+    "compatibilityLevel": "JAVA_8",
+    "target": "@env(DEFAULT)",
+    "package": "com.mumfrey.liteloader.client.mixin",
+    "refmap": "mixins.liteloader.client.refmap.json",
+    "mixins": [
+        "MixinMinecraft",
+        "MixinSession",
+        "MixinEntityRenderer",
+        "MixinRenderManager",
+        "MixinGuiIngame",
+        "MixinEntityPlayerSP",
+        "MixinFramebuffer",
+        "MixinIntegratedServer",
+        "MixinScreenShotHelper",
+        "MixinNetHandlerLoginClient",
+        "MixinRegistrySimple",
+        "MixinRegistryNamespaced",
+        "MixinTileEntityRendererDispatcher",
+        "MixinSimpleReloadableResourceManager",
+        "MixinSoundHandler",
+        "MixinGuiTextField",
+        "MixinIntIdentityHashBiMap",
+        "MixinGuiOverlayDebug",
+        "IGuiButton",
+        "IKeyBinding"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

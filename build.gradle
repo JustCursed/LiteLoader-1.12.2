@@ -1,0 +1,237 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+buildscript {
+	repositories {
+		jcenter()
+		mavenLocal()
+		mavenCentral()
+		maven { url = 'https://maven.minecraftforge.net' }
+		maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+	}
+	dependencies {
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+		classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+	}
+}
+
+plugins {
+	id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+configurations {
+	embed
+	implementation.extendsFrom(embed)
+}
+
+minecraft {
+	mappings channel: 'stable', version: '39-1.12'
+
+	runs {
+		client {
+			workingDirectory project.file('run')
+			property 'forge.logging.markers', 'REGISTRIES'
+			property 'forge.logging.console.level', 'debug'
+			mods {
+				sanctum {
+					source sourceSets.main
+				}
+			}
+		}
+
+		server {
+			workingDirectory project.file('run')
+			property 'forge.logging.markers', 'REGISTRIES'
+			property 'forge.logging.console.level', 'debug'
+			args += ['--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker',
+					'--mixin', 'mixins.liteloader.core.json',
+					'nogui']
+			mods {
+				sanctum {
+					source sourceSets.main
+				}
+			}
+		}
+	}
+}
+
+ext {
+	def isJenkins = project.hasProperty("jenkins")
+
+	buildNumber = isJenkins ? System.env.BUILD_NUMBER : (project.hasProperty("buildNumber") ? buildNumber : '0')
+	buildVersion = project.hasProperty("buildVersion") ? buildVersion : '0.0'
+	ciSystem = project.hasProperty("ciSystem") ? ciSystem : 'unknown'
+	commit = isJenkins ? System.env.GIT_COMMIT : (project.hasProperty("commit") ? commit : 'unknown')
+	classifier = project.hasProperty("buildType") ? buildType : 'SNAPSHOT'
+	isReleaseBuild = "RELEASE" == project.classifier.toUpperCase()
+	brand = isJenkins ? "${project.mcVersion}-SNAPSHOT-r${System.env.GIT_COMMIT.take(7).toUpperCase()}-b${System.env.BUILD_NUMBER}-${System.env.BUILD_ID}" : ""
+
+	projectName = 'LiteLoader'
+	inceptionYear = '2012'
+	packaging = 'jar'
+
+	startClass = 'com.mumfrey.liteloader.debug.Start'
+	tweakClass = 'com.mumfrey.liteloader.launch.LiteLoaderTweaker'
+}
+
+group = "com.mumfrey"
+archivesBaseName = "liteloader"
+version = buildVersion + (project.isReleaseBuild ? '' : '-' + project.classifier)
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+	maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies {
+	minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
+
+	implementation('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
+		exclude module: 'asm-commons'
+		exclude module: 'asm-tree'
+		exclude module: 'launchwrapper'
+		exclude module: 'guava'
+		exclude module: 'log4j-core'
+	}
+
+	annotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
+}
+
+sourceSets {
+	main {
+		ext.refMap = "mixins.liteloader.core.refmap.json"
+	}
+	client {
+		compileClasspath += main.compileClasspath + main.output
+		ext.refMap = "mixins.liteloader.client.refmap.json"
+	}
+	debug {
+		compileClasspath += client.compileClasspath + client.output
+	}
+}
+
+mixin {
+	add sourceSets.main, 'mixins.liteloader.core.refmap.json'
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+afterEvaluate {
+	logger.lifecycle '================================================='
+	logger.lifecycle '  LiteLoader'
+	logger.lifecycle '  Copyright (C) 2011-2017 Adam Mummery-Smith'
+	logger.lifecycle '  Running in {} mode', (project.isReleaseBuild ? "RELEASE" : "SNAPSHOT")
+	logger.lifecycle '================================================='
+}
+
+processResources {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	inputs.property "brand", project.brand
+	from (sourceSets.main.resources.srcDirs) {
+		include 'liteloader.properties'
+		filter { line -> line.startsWith('brand=') ? line + project.brand : line }
+	}
+}
+
+// manifest entries for all jars
+def jarManifest = {
+	attributes (
+		'Built-By': System.properties['user.name'],
+		'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+		'Implementation-Title': name,
+		'Implementation-Version': version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
+		'Implementation-Vendor': url
+	)
+}
+
+jar {
+	doFirst {
+		// Seriously forge?
+		ant.replace(
+			file: file("${compileJava.temporaryDir}/${sourceSets.main.refMap}"),
+			token: "func_72355_a(Lnet/minecraft/network/NetworkManager;Lnet/minecraft/entity/player/EntityPlayerMP;)V",
+			value: "initializeConnectionToPlayer(Lnet/minecraft/network/NetworkManager;Lnet/minecraft/entity/player/EntityPlayerMP;Lnet/minecraft/network/NetHandlerPlayServer;)V"
+		)
+	}
+	from sourceSets.client.output
+	from sourceSets.debug.output
+	manifest jarManifest
+}
+
+task releaseJar(type: Jar) {
+	from sourceSets.main.output
+	from sourceSets.client.output
+
+	manifest jarManifest
+	classifier = 'staging'
+}
+
+shadowJar {
+	manifest jarManifest
+
+	from sourceSets.main.output
+	from sourceSets.client.output
+
+	exclude 'META-INF/*.DSA'
+	exclude 'META-INF/*.RSA'
+	exclude 'dummyThing'
+	exclude 'LICENSE.txt'
+
+	dependencies {
+		include(dependency('org.spongepowered:mixin'))
+	}
+
+	classifier = 'release'
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	from javadoc.destinationDir
+	classifier = 'javadoc'
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs += [
+		'-Xlint:all',
+		'-Xlint:-path',
+		'-Xlint:-rawtypes',
+		'-Xlint:-processing'
+	]
+	options.deprecation = true
+	options.encoding = 'utf8'
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+	tasks.withType(Javadoc) {
+		// disable the crazy super-strict doclint tool in Java 8
+		options.addStringOption('Xdoclint:none', '-quiet')
+	}
+}
+
+def artifactBasePath = "$buildDir/libs/${project.archivesBaseName}-${project.version}"
+
+task shadeJar(type: ShadowJar) {
+	archiveClassifier.set('server')
+	mergeServiceFiles()
+	configurations = [project.configurations.embed]
+	from zipTree(artifactBasePath + '.jar')
+	manifest { inheritFrom jar.manifest }
+}
+
+reobf {
+	shadeJar {}
+}
+
+artifacts {
+	if (project.isReleaseBuild) {
+		archives jar
+	}
+	archives shadowJar
+	archives javadocJar
+}

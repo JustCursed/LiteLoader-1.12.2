@@ -1,4 +1,4 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+//import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 buildscript {
 	repositories {
@@ -13,16 +13,13 @@ buildscript {
 	}
 }
 
-plugins {
-	id 'com.github.johnrengelman.shadow' version '7.1.0'
-}
-
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
 configurations {
 	embed
 	implementation.extendsFrom(embed)
+	clientAnnotationProcessor
 }
 
 minecraft {
@@ -46,6 +43,7 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 			args += ['--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker',
 					'--mixin', 'mixins.liteloader.core.json',
+					'--mixin', 'mixins.liteloader.client.json',
 					'nogui']
 			mods {
 				sanctum {
@@ -59,12 +57,8 @@ minecraft {
 ext {
 	def isJenkins = project.hasProperty("jenkins")
 
-	buildNumber = isJenkins ? System.env.BUILD_NUMBER : (project.hasProperty("buildNumber") ? buildNumber : '0')
 	buildVersion = project.hasProperty("buildVersion") ? buildVersion : '0.0'
-	ciSystem = project.hasProperty("ciSystem") ? ciSystem : 'unknown'
-	commit = isJenkins ? System.env.GIT_COMMIT : (project.hasProperty("commit") ? commit : 'unknown')
-	classifier = project.hasProperty("buildType") ? buildType : 'SNAPSHOT'
-	isReleaseBuild = "RELEASE" == project.classifier.toUpperCase()
+	isReleaseBuild = true
 	brand = isJenkins ? "${project.mcVersion}-SNAPSHOT-r${System.env.GIT_COMMIT.take(7).toUpperCase()}-b${System.env.BUILD_NUMBER}-${System.env.BUILD_ID}" : ""
 
 	projectName = 'LiteLoader'
@@ -77,7 +71,7 @@ ext {
 
 group = "com.mumfrey"
 archivesBaseName = "liteloader"
-version = buildVersion + (project.isReleaseBuild ? '' : '-' + project.classifier)
+version = buildVersion
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -101,6 +95,7 @@ dependencies {
 	}
 
 	annotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
+	clientAnnotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
 }
 
 sourceSets {
@@ -118,9 +113,18 @@ sourceSets {
 
 mixin {
 	add sourceSets.main, 'mixins.liteloader.core.refmap.json'
+	add sourceSets.client, 'mixins.liteloader.client.refmap.json'
+
+	config 'mixins.liteloader.core.json'
+	config 'mixins.liteloader.client.json'
+}
+
+compileClientJava {
+	options.annotationProcessorPath = configurations.clientAnnotationProcessor
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets.client.resources { srcDir 'src/generated/resources' }
 
 afterEvaluate {
 	logger.lifecycle '================================================='
@@ -145,14 +149,14 @@ def jarManifest = {
 		'Built-By': System.properties['user.name'],
 		'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
 		'Implementation-Title': name,
-		'Implementation-Version': version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
-		'Implementation-Vendor': url
+		'Implementation-Version': version,
+		'Implementation-Vendor': url,
+		'TweakClass': tweakClass
 	)
 }
 
 jar {
 	doFirst {
-		// Seriously forge?
 		ant.replace(
 			file: file("${compileJava.temporaryDir}/${sourceSets.main.refMap}"),
 			token: "func_72355_a(Lnet/minecraft/network/NetworkManager;Lnet/minecraft/entity/player/EntityPlayerMP;)V",
@@ -164,7 +168,7 @@ jar {
 	manifest jarManifest
 }
 
-task releaseJar(type: Jar) {
+tasks.register('releaseJar', Jar) {
 	from sourceSets.main.output
 	from sourceSets.client.output
 
@@ -172,25 +176,8 @@ task releaseJar(type: Jar) {
 	classifier = 'staging'
 }
 
-shadowJar {
-	manifest jarManifest
-
-	from sourceSets.main.output
-	from sourceSets.client.output
-
-	exclude 'META-INF/*.DSA'
-	exclude 'META-INF/*.RSA'
-	exclude 'dummyThing'
-	exclude 'LICENSE.txt'
-
-	dependencies {
-		include(dependency('org.spongepowered:mixin'))
-	}
-
-	classifier = 'release'
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+	dependsOn javadoc
 	from javadoc.destinationDir
 	classifier = 'javadoc'
 }
@@ -213,24 +200,10 @@ if (JavaVersion.current().isJava8Compatible()) {
 	}
 }
 
-def artifactBasePath = "$buildDir/libs/${project.archivesBaseName}-${project.version}"
-
-task shadeJar(type: ShadowJar) {
-	archiveClassifier.set('server')
-	mergeServiceFiles()
-	configurations = [project.configurations.embed]
-	from zipTree(artifactBasePath + '.jar')
-	manifest { inheritFrom jar.manifest }
-}
-
-reobf {
-	shadeJar {}
-}
-
 artifacts {
-	if (project.isReleaseBuild) {
-		archives jar
-	}
-	archives shadowJar
+	archives jar
+	archives releaseJar
 	archives javadocJar
 }
+
+build.dependsOn releaseJar

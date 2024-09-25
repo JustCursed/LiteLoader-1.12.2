@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mumfrey.liteloader.launch.LiteLoaderTweaker;
 import com.mumfrey.liteloader.launch.LiteLoaderTweakerServer;
 import com.mumfrey.liteloader.util.log.LiteLoaderLogger;
+import top.outlands.foundation.boot.Foundation;
 
 /**
  * Wrapper class for LaunchWrapper Main class, which logs in using Yggdrasil
@@ -50,7 +51,7 @@ public abstract class Start
     public static void main(String[] args)
     {
         System.setProperty("mcpenv", "true");
-        Launch.main(Start.processArgs(args));
+        Foundation.main(Start.processArgs(args));
     }
 
     /**

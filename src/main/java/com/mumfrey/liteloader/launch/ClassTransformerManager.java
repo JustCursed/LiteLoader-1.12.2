@@ -26,6 +26,7 @@ import com.mumfrey.liteloader.util.log.LiteLoaderLogger.Verbosity;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraft.launchwrapper.LogWrapper;
+import top.outlands.foundation.TransformerDelegate;
 
 /**
  * Manages injection of required and optional transformers
@@ -169,7 +170,7 @@ public class ClassTransformerManager
     {
         this.gameStarted = true;
 
-        if (this.downstreamTransformers.size() > 0)
+        if (!this.downstreamTransformers.isEmpty())
         {
             LiteLoaderLogger.info("Injecting downstream transformers");
         }
@@ -191,13 +192,13 @@ public class ClassTransformerManager
             this.pendingTransformer = transformerClassName;
 
             // Register the transformer
-            classLoader.registerTransformer(transformerClassName);
+	        TransformerDelegate.registerTransformer(transformerClassName);
 
             // Unassign pending transformer now init is completed
             this.pendingTransformer = null;
 
             // Check whether the transformer was successfully injected, look for it in the transformer list
-            if (this.findTransformer(classLoader, transformerClassName) != null)
+            if (this.findTransformer(transformerClassName) != null)
             {
                 this.injectedTransformers.add(transformerClassName);
             }
@@ -222,9 +223,9 @@ public class ClassTransformerManager
         }
     }
 
-    private IClassTransformer findTransformer(LaunchClassLoader classLoader, String transformerClassName)
+    private IClassTransformer findTransformer(String transformerClassName)
     {
-        for (IClassTransformer transformer : classLoader.getTransformers())
+        for (IClassTransformer transformer : TransformerDelegate.getTransformers())
         {
             if (transformer.getClass().getName().equals(transformerClassName))
             {

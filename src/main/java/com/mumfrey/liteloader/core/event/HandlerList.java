@@ -50,6 +50,7 @@ import com.mumfrey.liteloader.util.log.LiteLoaderLogger;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
+import top.outlands.foundation.TransformerDelegate;
 
 /**
  * HandlerList is a generic class which supports baking a list of event handlers
@@ -1114,7 +1115,7 @@ public class HandlerList<T> extends LinkedList<T> implements FastIterableDeque<T
         {
             byte[] bytes = Launch.classLoader.getClassBytes(name);
 
-            for (final IClassTransformer transformer : Launch.classLoader.getTransformers())
+            for (final IClassTransformer transformer : TransformerDelegate.getTransformers())
             {
                 bytes = transformer.transform(name, name, bytes);
             }

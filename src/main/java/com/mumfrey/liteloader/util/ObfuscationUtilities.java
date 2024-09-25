@@ -8,9 +8,9 @@ package com.mumfrey.liteloader.util;
 import com.mumfrey.liteloader.core.runtime.Obf;
 
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import top.outlands.foundation.TransformerDelegate;
 
 public class ObfuscationUtilities
 {
@@ -31,7 +31,7 @@ public class ObfuscationUtilities
 
     public static boolean fmlIsPresent()
     {
-        for (IClassTransformer transformer : Launch.classLoader.getTransformers())
+        for (IClassTransformer transformer : TransformerDelegate.getTransformers())
         {
             if (transformer.getClass().getName().contains("fml"))
             {

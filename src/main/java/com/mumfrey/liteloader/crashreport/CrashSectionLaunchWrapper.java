@@ -9,7 +9,7 @@ import java.util.List;
 
 import net.minecraft.crash.CrashReport;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.launchwrapper.Launch;
+import top.outlands.foundation.TransformerDelegate;
 
 public class CrashSectionLaunchWrapper
 {
@@ -34,7 +34,7 @@ public class CrashSectionLaunchWrapper
      */
     public static String generateTransformerList()
     {
-        final List<IClassTransformer> transformers = Launch.classLoader.getTransformers();
+        final List<IClassTransformer> transformers = TransformerDelegate.getTransformers();
 
         StringBuilder sb = new StringBuilder();
         sb.append(transformers.size());

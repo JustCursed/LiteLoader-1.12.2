@@ -38,6 +38,7 @@ import com.mumfrey.liteloader.core.runtime.Obf;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
+import top.outlands.foundation.TransformerDelegate;
 
 /**
  * Utility methods for working with bytecode using ASM
@@ -694,7 +695,7 @@ public abstract class ByteCodeUtilities
 
     public static byte[] applyTransformers(String className, byte[] basicClass, IClassTransformer source)
     {
-        final List<IClassTransformer> transformers = Launch.classLoader.getTransformers();
+        final List<IClassTransformer> transformers = TransformerDelegate.getTransformers();
 
         for (final IClassTransformer transformer : transformers)
         {

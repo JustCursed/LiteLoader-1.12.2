@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.activity.InvalidActivityException;
-
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import com.mumfrey.liteloader.LiteMod;
@@ -619,13 +617,13 @@ public final class LiteLoader
      * Get a reference to a loaded mod, if the mod exists
      * 
      * @param modName Mod's name, identifier or class name
-     * @throws InvalidActivityException
+     * @throws RuntimeException
      */
-    public <T extends LiteMod> T getMod(String modName) throws InvalidActivityException, IllegalArgumentException
+    public <T extends LiteMod> T getMod(String modName) throws RuntimeException, IllegalArgumentException
     {
         if (!this.modInitComplete)
         {
-            throw new InvalidActivityException("Attempted to get a reference to a mod before loader startup is complete");
+            throw new RuntimeException("Attempted to get a reference to a mod before loader startup is complete");
         }
 
         return this.mods.getMod(modName);

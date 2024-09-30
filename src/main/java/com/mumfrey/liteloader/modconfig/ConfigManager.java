@@ -24,221 +24,186 @@ import com.mumfrey.liteloader.util.log.LiteLoaderLogger;
  *
  * @author Adam Mummery-Smith
  */
-public class ConfigManager
-{
-    /**
-     * Mod config panel classes
-     */
-    private Map<Class<? extends LiteMod>, Class<? extends ConfigPanel>> configPanels = Maps.newHashMap();
-    
-    /**
-     * Mod config writers
-     */
-    private Map<Exposable, ExposableConfigWriter> configWriters = new HashMap<Exposable, ExposableConfigWriter>();
+public class ConfigManager {
+	/**
+	 * Mod config panel classes
+	 */
+	private Map<Class<? extends LiteMod>, Class<? extends ConfigPanel>> configPanels = Maps.newHashMap();
 
-    /**
-     * List of config writers, for faster iteration in onTick
-     */
-    private List<ExposableConfigWriter> configWriterList = new ArrayList<ExposableConfigWriter>();
+	/**
+	 * Mod config writers
+	 */
+	private Map<Exposable, ExposableConfigWriter> configWriters = new HashMap<Exposable, ExposableConfigWriter>();
 
-    /**
-     * Register a mod, adds the config panel class to the map if the mod
-     * implements Configurable
-     */
-    public void registerMod(LiteMod mod)
-    {
-        if (mod instanceof Configurable)
-        {
-            Class<? extends ConfigPanel> panelClass = ((Configurable)mod).getConfigPanelClass();
-            if (panelClass != null) this.configPanels.put(mod.getClass(), panelClass);
-        }
+	/**
+	 * List of config writers, for faster iteration in onTick
+	 */
+	private List<ExposableConfigWriter> configWriterList = new ArrayList<ExposableConfigWriter>();
 
-        this.registerExposable(mod, null, false);
-    }
+	/**
+	 * Register a mod, adds the config panel class to the map if the mod
+	 * implements Configurable
+	 */
+	public void registerMod(LiteMod mod) {
+		if (mod instanceof Configurable) {
+			Class<? extends ConfigPanel> panelClass = ((Configurable) mod).getConfigPanelClass();
+			if (panelClass != null) this.configPanels.put(mod.getClass(), panelClass);
+		}
 
-    /**
-     * @param exposable
-     * @param fallbackFileName
-     * @param ignoreMissingConfigAnnotation
-     */
-    public void registerExposable(Exposable exposable, String fallbackFileName, boolean ignoreMissingConfigAnnotation)
-    {
-        ExposableOptions options = exposable.getClass().<ExposableOptions>getAnnotation(ExposableOptions.class);
-        if (options != null)
-        {
-            if (fallbackFileName == null) fallbackFileName = options.filename();
-            this.initConfigWriter(exposable, fallbackFileName, options.strategy(), options.aggressive());
-        }
-        else if (ignoreMissingConfigAnnotation)
-        {
-            this.initConfigWriter(exposable, fallbackFileName, ConfigStrategy.Versioned, false);
-        }
-    }
+		this.registerExposable(mod, null, false);
+	}
 
-    /**
-     * Create a config writer instance for the specified mod
-     * 
-     * @param exposable
-     * @param fileName
-     * @param strategy
-     */
-    private void initConfigWriter(Exposable exposable, String fileName, ConfigStrategy strategy, boolean aggressive)
-    {
-        if (this.configWriters.containsKey(exposable))
-        {
-            return;
-        }
+	/**
+	 * @param exposable
+	 * @param fallbackFileName
+	 * @param ignoreMissingConfigAnnotation
+	 */
+	public void registerExposable(Exposable exposable, String fallbackFileName, boolean ignoreMissingConfigAnnotation) {
+		ExposableOptions options = exposable.getClass().<ExposableOptions>getAnnotation(ExposableOptions.class);
+		if (options != null) {
+			if (fallbackFileName == null) fallbackFileName = options.filename();
+			this.initConfigWriter(exposable, fallbackFileName, options.strategy(), options.aggressive());
+		} else if (ignoreMissingConfigAnnotation) {
+			this.initConfigWriter(exposable, fallbackFileName, ConfigStrategy.Versioned, false);
+		}
+	}
 
-        if (Strings.isNullOrEmpty(fileName))
-        {
-            fileName = exposable.getClass().getSimpleName().toLowerCase();
+	/**
+	 * Create a config writer instance for the specified mod
+	 *
+	 * @param exposable
+	 * @param fileName
+	 * @param strategy
+	 */
+	private void initConfigWriter(Exposable exposable, String fileName, ConfigStrategy strategy, boolean aggressive) {
+		if (this.configWriters.containsKey(exposable)) {
+			return;
+		}
 
-            if (fileName.startsWith("litemod"))
-            {
-                fileName = fileName.substring(7);
-            }
-        }
+		if (Strings.isNullOrEmpty(fileName)) {
+			fileName = exposable.getClass().getSimpleName().toLowerCase();
 
-        ExposableConfigWriter configWriter = ExposableConfigWriter.create(exposable, strategy, fileName, aggressive);
-        if (configWriter != null)
-        {
-            this.configWriters.put(exposable, configWriter);
-            this.configWriterList.add(configWriter);
-        }
-    }
+			if (fileName.startsWith("litemod")) {
+				fileName = fileName.substring(7);
+			}
+		}
 
-    /**
-     * If the specified mod has a versioned config strategy, attempt to copy the
-     * config.
-     * 
-     * @param mod
-     * @param newConfigPath
-     * @param oldConfigPath
-     */
-    public void migrateModConfig(LiteMod mod, File newConfigPath, File oldConfigPath)
-    {
-        if (this.configWriters.containsKey(mod))
-        {
-            ExposableConfigWriter writer = this.configWriters.get(mod);
-            if (writer.isVersioned())
-            {
-                File newConfigFile = writer.getConfigFile();
-                File legacyConfigFile = new File(oldConfigPath, newConfigFile.getName());
+		ExposableConfigWriter configWriter = ExposableConfigWriter.create(exposable, strategy, fileName, aggressive);
+		if (configWriter != null) {
+			this.configWriters.put(exposable, configWriter);
+			this.configWriterList.add(configWriter);
+		}
+	}
 
-                if (legacyConfigFile.exists() && !newConfigFile.exists())
-                {
-                    try
-                    {
-                        Files.copy(legacyConfigFile, newConfigFile);
-                    }
-                    catch (IOException ex)
-                    {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
+	/**
+	 * If the specified mod has a versioned config strategy, attempt to copy the
+	 * config.
+	 *
+	 * @param mod
+	 * @param newConfigPath
+	 * @param oldConfigPath
+	 */
+	public void migrateModConfig(LiteMod mod, File newConfigPath, File oldConfigPath) {
+		if (this.configWriters.containsKey(mod)) {
+			ExposableConfigWriter writer = this.configWriters.get(mod);
+			if (writer.isVersioned()) {
+				File newConfigFile = writer.getConfigFile();
+				File legacyConfigFile = new File(oldConfigPath, newConfigFile.getName());
 
-    /**
-     * Check whether a config panel is available for the specified class
-     * 
-     * @param modClass
-     */
-    public boolean hasPanel(Class<? extends LiteMod> modClass)
-    {
-        return modClass != null && this.configPanels.containsKey(modClass);
-    }
+				if (legacyConfigFile.exists() && !newConfigFile.exists()) {
+					try {
+						Files.copy(legacyConfigFile, newConfigFile);
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		}
+	}
 
-    /**
-     * Instance a new config panel for the specified mod class if one is
-     * available.
-     * 
-     * @param modClass
-     */
-    public ConfigPanel getPanel(Class<? extends LiteMod> modClass)
-    {
-        if (modClass != null && this.configPanels.containsKey(modClass))
-        {
-            try
-            {
-                return this.configPanels.get(modClass).newInstance();
-            }
-            catch (InstantiationException ex) {}
-            catch (IllegalAccessException ex) {}
-            catch (Exception ex)
-            {
-                LiteLoaderLogger.severe("Error creating mod configuration panel <%s> for mod %s", this.configPanels.get(modClass), modClass);
-            }
+	/**
+	 * Check whether a config panel is available for the specified class
+	 *
+	 * @param modClass
+	 */
+	public boolean hasPanel(Class<? extends LiteMod> modClass) {
+		return modClass != null && this.configPanels.containsKey(modClass);
+	}
 
-            // If instantiation fails, remove the panel
-            this.configPanels.remove(modClass);
-        }
+	/**
+	 * Instance a new config panel for the specified mod class if one is
+	 * available.
+	 *
+	 * @param modClass
+	 */
+	public ConfigPanel getPanel(Class<? extends LiteMod> modClass) {
+		if (modClass != null && this.configPanels.containsKey(modClass)) {
+			try {
+				return this.configPanels.get(modClass).newInstance();
+			} catch (InstantiationException ex) {
+			} catch (IllegalAccessException ex) {
+			} catch (Exception ex) {
+				LiteLoaderLogger.severe("Error creating mod configuration panel <%s> for mod %s", this.configPanels.get(modClass), modClass);
+			}
 
-        return null;
-    }
+			// If instantiation fails, remove the panel
+			this.configPanels.remove(modClass);
+		}
 
-    /**
-     * Initialise the config writer for the specified mod
-     * 
-     * @param exposable
-     */
-    public void initConfig(Exposable exposable)
-    {
-        if (this.configWriters.containsKey(exposable))
-        {
-            this.configWriters.get(exposable).init();
-        }
-    }
+		return null;
+	}
 
-    /**
-     * Invalidate the specified mod config, cause it to be written to disk or
-     * scheduled for writing if it has been written recently.
-     * 
-     * @param exposable
-     */
-    public void invalidateConfig(Exposable exposable)
-    {
-        if (this.configWriters.containsKey(exposable))
-        {
-            this.configWriters.get(exposable).invalidate();
-        }
-    }
+	/**
+	 * Initialise the config writer for the specified mod
+	 *
+	 * @param exposable
+	 */
+	public void initConfig(Exposable exposable) {
+		if (this.configWriters.containsKey(exposable)) {
+			this.configWriters.get(exposable).init();
+		}
+	}
 
-    /**
-     * Tick all of the configuration writers, handles latent writes for
-     * anti-hammer strategy.
-     */
-    public void onTick()
-    {
-        for (ExposableConfigWriter writer : this.configWriterList)
-        {
-            writer.onTick();
-        }
-    }
+	/**
+	 * Invalidate the specified mod config, cause it to be written to disk or
+	 * scheduled for writing if it has been written recently.
+	 *
+	 * @param exposable
+	 */
+	public void invalidateConfig(Exposable exposable) {
+		if (this.configWriters.containsKey(exposable)) {
+			this.configWriters.get(exposable).invalidate();
+		}
+	}
 
-    /**
-     * Force all mod configs to be flushed to disk
-     */
-    public void syncConfig()
-    {
-        for (ExposableConfigWriter writer : this.configWriterList)
-        {
-            writer.sync();
-        }
-    }
+	/**
+	 * Tick all of the configuration writers, handles latent writes for
+	 * anti-hammer strategy.
+	 */
+	public void onTick() {
+		for (ExposableConfigWriter writer : this.configWriterList) {
+			writer.onTick();
+		}
+	}
 
-    /**
-     * @param exposable
-     */
-    public static ConfigStrategy getConfigStrategy(Exposable exposable)
-    {
-        ExposableOptions options = exposable.getClass().<ExposableOptions>getAnnotation(ExposableOptions.class);
-        if (options != null)
-        {
-            return options.strategy();
-        }
+	/**
+	 * Force all mod configs to be flushed to disk
+	 */
+	public void syncConfig() {
+		for (ExposableConfigWriter writer : this.configWriterList) {
+			writer.sync();
+		}
+	}
 
-        return ConfigStrategy.Unversioned;
-    }
+	/**
+	 * @param exposable
+	 */
+	public static ConfigStrategy getConfigStrategy(Exposable exposable) {
+		ExposableOptions options = exposable.getClass().<ExposableOptions>getAnnotation(ExposableOptions.class);
+		if (options != null) {
+			return options.strategy();
+		}
+
+		return ConfigStrategy.Unversioned;
+	}
 }

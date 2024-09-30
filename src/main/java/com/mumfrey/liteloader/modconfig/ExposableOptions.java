@@ -18,20 +18,19 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ExposableOptions
-{
-    /**
-     * Configuration strategy to use
-     */
-    ConfigStrategy strategy() default ConfigStrategy.Unversioned;
+public @interface ExposableOptions {
+	/**
+	 * Configuration strategy to use
+	 */
+	ConfigStrategy strategy() default ConfigStrategy.Unversioned;
 
-    /**
-     * Config file name, if not specified the mod class name is used
-     */
-    String filename() default "";
+	/**
+	 * Config file name, if not specified the mod class name is used
+	 */
+	String filename() default "";
 
-    /**
-     * Set to true to disable write anti-hammer for config file
-     */
-    boolean aggressive() default false;
+	/**
+	 * Set to true to disable write anti-hammer for config file
+	 */
+	boolean aggressive() default false;
 }

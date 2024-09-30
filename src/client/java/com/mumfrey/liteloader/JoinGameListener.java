@@ -18,17 +18,16 @@ import net.minecraft.network.play.server.SPacketJoinGame;
  *
  * @author Adam Mummery-Smith
  */
-public interface JoinGameListener extends LiteMod
-{
-    /**
-     * Called on join game
-     * 
-     * @param netHandler Net handler
-     * @param joinGamePacket Join game packet
-     * @param serverData ServerData object representing the server being
-     *      connected to
-     * @param realmsServer If connecting to a realm, a reference to the
-     *      RealmsServer object
-     */
-    public abstract void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer);
+public interface JoinGameListener extends LiteMod {
+	/**
+	 * Called on join game
+	 *
+	 * @param netHandler     Net handler
+	 * @param joinGamePacket Join game packet
+	 * @param serverData     ServerData object representing the server being
+	 *                       connected to
+	 * @param realmsServer   If connecting to a realm, a reference to the
+	 *                       RealmsServer object
+	 */
+	public abstract void onJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket, ServerData serverData, RealmsServer realmsServer);
 }

@@ -23,29 +23,25 @@ import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.world.WorldSettings;
 
 @Mixin(IntegratedServer.class)
-public abstract class MixinIntegratedServer extends MinecraftServer
-{
-    private LiteLoaderEventBrokerClient broker = LiteLoaderEventBrokerClient.getInstance();
-    
-    public MixinIntegratedServer()
-    {
-        super(null, null, null, null, null, null, null);
-    }
-    
-    @Inject(
-        method = "<init>*", //(Lnet/minecraft/client/Minecraft;Ljava/lang/String;Ljava/lang/String;Lnet/minecraft/world/WorldSettings;)V",
-        at = @At("RETURN"),
-        remap = false
-    )
-    private void onConstructed(Minecraft mcIn, String folderName, String worldName, WorldSettings settings, YggdrasilAuthenticationService authSrv,
-            MinecraftSessionService sessionSrv, GameProfileRepository profileRepo, PlayerProfileCache profileCache, CallbackInfo ci)
-    {
-        this.broker.onStartServer(this, folderName, worldName, settings);
-    }
+public abstract class MixinIntegratedServer extends MinecraftServer {
+	private LiteLoaderEventBrokerClient broker = LiteLoaderEventBrokerClient.getInstance();
 
-    @Surrogate
-    private void onConstructed(Minecraft mcIn, CallbackInfo ci)
-    {
+	public MixinIntegratedServer() {
+		super(null, null, null, null, null, null, null);
+	}
+
+	@Inject(
+		method = "<init>*", //(Lnet/minecraft/client/Minecraft;Ljava/lang/String;Ljava/lang/String;Lnet/minecraft/world/WorldSettings;)V",
+		at = @At("RETURN"),
+		remap = false
+	)
+	private void onConstructed(Minecraft mcIn, String folderName, String worldName, WorldSettings settings, YggdrasilAuthenticationService authSrv,
+	                           MinecraftSessionService sessionSrv, GameProfileRepository profileRepo, PlayerProfileCache profileCache, CallbackInfo ci) {
+		this.broker.onStartServer(this, folderName, worldName, settings);
+	}
+
+	@Surrogate
+	private void onConstructed(Minecraft mcIn, CallbackInfo ci) {
 //        ClientProxy.onCreateIntegratedServer((IntegratedServer)(Object)this, folderName, worldName, settings);
-    }
+	}
 }

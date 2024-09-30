@@ -15,15 +15,14 @@ import net.minecraft.network.play.server.SPacketJoinGame;
  *
  * @author Adam Mummery-Smith
  */
-public interface PreJoinGameListener extends LiteMod
-{
-    /**
-     * Called before login. NOTICE: as of 1.8 the return value of this method
-     * has a different meaning! 
-     * 
-     * @param netHandler Net handler
-     * @param joinGamePacket Join game packet
-     * @return true to allow login to continue, false to cancel login
-     */
-    public abstract boolean onPreJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket);
+public interface PreJoinGameListener extends LiteMod {
+	/**
+	 * Called before login. NOTICE: as of 1.8 the return value of this method
+	 * has a different meaning!
+	 *
+	 * @param netHandler     Net handler
+	 * @param joinGamePacket Join game packet
+	 * @return true to allow login to continue, false to cancel login
+	 */
+	public abstract boolean onPreJoinGame(INetHandler netHandler, SPacketJoinGame joinGamePacket);
 }

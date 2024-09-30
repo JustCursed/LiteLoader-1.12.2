@@ -6,19 +6,18 @@
 package com.mumfrey.liteloader.api;
 
 /**
- * Container for all of an API's mixin environment configuration 
+ * Container for all of an API's mixin environment configuration
  */
-public interface MixinConfigProvider
-{
-    /**
-     * Get mixin configuration files for this API, all returned configs will be
-     * added to the DEFAULT environment. Can return null.
-     */
-    public abstract String[] getMixinConfigs();
+public interface MixinConfigProvider {
+	/**
+	 * Get mixin configuration files for this API, all returned configs will be
+	 * added to the DEFAULT environment. Can return null.
+	 */
+	public abstract String[] getMixinConfigs();
 
-    /**
-     * Get mixin error handler classes to register for this API. Can return
-     * null.
-     */
-    public abstract String[] getErrorHandlers();
+	/**
+	 * Get mixin error handler classes to register for this API. Can return
+	 * null.
+	 */
+	public abstract String[] getErrorHandlers();
 }

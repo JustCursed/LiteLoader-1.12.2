@@ -30,49 +30,63 @@ import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.util.Timer;
 
 @Mixin(Minecraft.class)
-public abstract class MixinMinecraft implements IMinecraft
-{
-	@Shadow @Final private Timer timer;
-	@Shadow volatile boolean running;
-	@Shadow @Final private List<IResourcePack> defaultResourcePacks;
-	@Shadow private String serverName;
-	@Shadow private int serverPort;
-	@Shadow private boolean isGamePaused;
-	@Shadow private float renderPartialTicksPaused;
+public abstract class MixinMinecraft implements IMinecraft {
+	@Shadow
+	@Final
+	private Timer timer;
+	@Shadow
+	volatile boolean running;
+	@Shadow
+	@Final
+	private List<IResourcePack> defaultResourcePacks;
+	@Shadow
+	private String serverName;
+	@Shadow
+	private int serverPort;
+	@Shadow
+	private boolean isGamePaused;
+	@Shadow
+	private float renderPartialTicksPaused;
 
-	@Shadow public void resize(int width, int height) {}
-	@Shadow private void clickMouse() {}
-	@Shadow private void rightClickMouse() {}
-	@Shadow private void middleClickMouse() {}
+	@Shadow
+	public void resize(int width, int height) {
+	}
+
+	@Shadow
+	private void clickMouse() {
+	}
+
+	@Shadow
+	private void rightClickMouse() {
+	}
+
+	@Shadow
+	private void middleClickMouse() {
+	}
 
 	private LiteLoaderEventBrokerClient broker;
 
 	@Inject(method = "init()V", at = @At(value = "NEW", target = "net/minecraft/client/renderer/EntityRenderer"))
-	private void init(CallbackInfo ci)
-	{
+	private void init(CallbackInfo ci) {
 		LiteLoaderTweaker.init();
 		LiteLoaderTweaker.postInit();
 	}
 
 	@Inject(method = "init()V", at = @At(value = "NEW", target = "net/minecraft/client/renderer/texture/TextureMap"))
-	private void initTextures(CallbackInfo ci)
-	{
+	private void initTextures(CallbackInfo ci) {
 		LoadingBar.initTextures();
 	}
 
 	@Inject(method = "init()V", at = @At("INVOKE"))
-	private void progress(CallbackInfo ci)
-	{
+	private void progress(CallbackInfo ci) {
 		LoadingBar.incrementProgress();
 	}
 
 	@Inject(method = "init()V", at = @At("RETURN"))
-	private void onStartupComplete(CallbackInfo ci)
-	{
+	private void onStartupComplete(CallbackInfo ci) {
 		this.broker = LiteLoaderEventBrokerClient.getInstance();
 
-		if (this.broker == null)
-		{
+		if (this.broker == null) {
 			throw new RuntimeException("LiteLoader failed to start up properly."
 				+ " The game is in an unstable state and must shut down now. Check the developer log for startup errors");
 		}
@@ -81,17 +95,14 @@ public abstract class MixinMinecraft implements IMinecraft
 	}
 
 	@Inject(method = "updateFramebufferSize()V", at = @At("HEAD"))
-	private void onResize(CallbackInfo ci)
-	{
-		if (this.broker != null)
-		{
-			this.broker.onResize((Minecraft)(Object)this);
+	private void onResize(CallbackInfo ci) {
+		if (this.broker != null) {
+			this.broker.onResize((Minecraft) (Object) this);
 		}
 	}
 
 	@Inject(method = "runTick()V", at = @At("HEAD"))
-	private void newTick(CallbackInfo ci)
-	{
+	private void newTick(CallbackInfo ci) {
 //        ClientProxy.newTick();
 	}
 
@@ -100,8 +111,7 @@ public abstract class MixinMinecraft implements IMinecraft
 		shift = Shift.AFTER,
 		target = "Lnet/minecraft/client/renderer/EntityRenderer;updateCameraAndRender(FJ)V"
 	))
-	private void onTick(CallbackInfo ci)
-	{
+	private void onTick(CallbackInfo ci) {
 		boolean clock = this.timer.elapsedTicks > 0;
 		float partialTicks = this.isGamePaused ? this.renderPartialTicksPaused : this.timer.renderPartialTicks;
 		this.broker.onTick(clock, partialTicks);
@@ -111,23 +121,18 @@ public abstract class MixinMinecraft implements IMinecraft
 		value = "INVOKE",
 		target = "Lnet/minecraft/client/shader/Framebuffer;framebufferRender(II)V"
 	))
-	private void renderFBO(Framebuffer framebufferMc, int width, int height)
-	{
+	private void renderFBO(Framebuffer framebufferMc, int width, int height) {
 		boolean fboEnabled = OpenGlHelper.isFramebufferEnabled();
-		if (fboEnabled && this.broker != null)
-		{
-			if (framebufferMc instanceof IFramebuffer)
-			{
-				((IFramebuffer)framebufferMc).setDispatchRenderEvent(true);
+		if (fboEnabled && this.broker != null) {
+			if (framebufferMc instanceof IFramebuffer) {
+				((IFramebuffer) framebufferMc).setDispatchRenderEvent(true);
 			}
 			this.broker.preRenderFBO(framebufferMc);
 
 			framebufferMc.framebufferRender(width, height);
 
 			this.broker.postRenderFBO(framebufferMc);
-		}
-		else
-		{
+		} else {
 			framebufferMc.framebufferRender(width, height);
 		}
 	}
@@ -137,8 +142,7 @@ public abstract class MixinMinecraft implements IMinecraft
 		target = "Lnet/minecraft/profiler/Profiler;startSection(Ljava/lang/String;)V",
 		args = "ldc=tick"
 	))
-	private void onTimerUpdate(CallbackInfo ci)
-	{
+	private void onTimerUpdate(CallbackInfo ci) {
 		this.broker.onTimerUpdate();
 	}
 
@@ -147,8 +151,7 @@ public abstract class MixinMinecraft implements IMinecraft
 		target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V",
 		args = "ldc=gameRenderer"
 	))
-	private void onRender(CallbackInfo ci)
-	{
+	private void onRender(CallbackInfo ci) {
 		this.broker.onRender();
 	}
 
@@ -156,10 +159,8 @@ public abstract class MixinMinecraft implements IMinecraft
 		value = "INVOKE",
 		target = "Lnet/minecraft/client/Minecraft;clickMouse()V"
 	))
-	private void onClickMouse(Minecraft self)
-	{
-		if (this.broker.onClickMouse(self.player, MouseButton.LEFT))
-		{
+	private void onClickMouse(Minecraft self) {
+		if (this.broker.onClickMouse(self.player, MouseButton.LEFT)) {
 			this.clickMouse();
 		}
 	}
@@ -171,10 +172,8 @@ public abstract class MixinMinecraft implements IMinecraft
 	),
 		cancellable = true
 	)
-	private void onMouseHeld(boolean leftClick, CallbackInfo ci)
-	{
-		if (!this.broker.onMouseHeld(((Minecraft)(Object)this).player, MouseButton.LEFT))
-		{
+	private void onMouseHeld(boolean leftClick, CallbackInfo ci) {
+		if (!this.broker.onMouseHeld(((Minecraft) (Object) this).player, MouseButton.LEFT)) {
 			ci.cancel();
 		}
 	}
@@ -184,10 +183,8 @@ public abstract class MixinMinecraft implements IMinecraft
 		target = "Lnet/minecraft/client/Minecraft;rightClickMouse()V",
 		ordinal = 0
 	))
-	private void onRightClickMouse(Minecraft self)
-	{
-		if (this.broker.onClickMouse(self.player, MouseButton.RIGHT))
-		{
+	private void onRightClickMouse(Minecraft self) {
+		if (this.broker.onClickMouse(self.player, MouseButton.RIGHT)) {
 			this.rightClickMouse();
 		}
 	}
@@ -197,10 +194,8 @@ public abstract class MixinMinecraft implements IMinecraft
 		target = "Lnet/minecraft/client/Minecraft;rightClickMouse()V",
 		ordinal = 1
 	))
-	private void onRightMouseHeld(Minecraft self)
-	{
-		if (this.broker.onMouseHeld(self.player, MouseButton.RIGHT))
-		{
+	private void onRightMouseHeld(Minecraft self) {
+		if (this.broker.onMouseHeld(self.player, MouseButton.RIGHT)) {
 			this.rightClickMouse();
 		}
 	}
@@ -209,47 +204,39 @@ public abstract class MixinMinecraft implements IMinecraft
 		value = "INVOKE",
 		target = "Lnet/minecraft/client/Minecraft;middleClickMouse()V"
 	))
-	private void onMiddleClickMouse(Minecraft self)
-	{
-		if (this.broker.onClickMouse(self.player, MouseButton.MIDDLE))
-		{
+	private void onMiddleClickMouse(Minecraft self) {
+		if (this.broker.onClickMouse(self.player, MouseButton.MIDDLE)) {
 			this.middleClickMouse();
 		}
 	}
 
 	@Override
-	public Timer getTimer()
-	{
+	public Timer getTimer() {
 		return this.timer;
 	}
 
 	@Override
-	public boolean isRunning()
-	{
+	public boolean isRunning() {
 		return this.running;
 	}
 
 	@Override
-	public List<IResourcePack> getDefaultResourcePacks()
-	{
+	public List<IResourcePack> getDefaultResourcePacks() {
 		return this.defaultResourcePacks;
 	}
 
 	@Override
-	public String getServerName()
-	{
+	public String getServerName() {
 		return this.serverName;
 	}
 
 	@Override
-	public int getServerPort()
-	{
+	public int getServerPort() {
 		return this.serverPort;
 	}
 
 	@Override
-	public void onResizeWindow(int width, int height)
-	{
+	public void onResizeWindow(int width, int height) {
 		this.resize(width, height);
 	}
 

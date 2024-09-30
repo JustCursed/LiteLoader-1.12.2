@@ -40,232 +40,198 @@ import net.minecraft.util.text.TextComponentString;
 
 /**
  * Client-side packet event handlers
- * 
+ *
  * @author Adam Mummery-Smith
  */
-public class PacketEventsClient extends PacketEvents
-{
-    private static RealmsServer joiningRealm;
+public class PacketEventsClient extends PacketEvents {
+	private static RealmsServer joiningRealm;
 
-    private FastIterableDeque<JoinGameListener>    joinGameListeners    = new HandlerList<JoinGameListener>(JoinGameListener.class);
-    private FastIterableDeque<ChatListener>        chatListeners        = new HandlerList<ChatListener>(ChatListener.class);
-    private FastIterableDeque<ChatFilter>          chatFilters          = new HandlerList<ChatFilter>(ChatFilter.class,
-                                                                                                        ReturnLogicOp.AND_BREAK_ON_FALSE);
-    private FastIterableDeque<PreJoinGameListener> preJoinGameListeners = new HandlerList<PreJoinGameListener>(PreJoinGameListener.class,
-                                                                                                        ReturnLogicOp.AND_BREAK_ON_FALSE);
-    private FastIterableDeque<PostLoginListener>   postLoginListeners   = new HandlerList<PostLoginListener>(PostLoginListener.class);
+	private FastIterableDeque<JoinGameListener> joinGameListeners = new HandlerList<JoinGameListener>(JoinGameListener.class);
+	private FastIterableDeque<ChatListener> chatListeners = new HandlerList<ChatListener>(ChatListener.class);
+	private FastIterableDeque<ChatFilter> chatFilters = new HandlerList<ChatFilter>(ChatFilter.class,
+		ReturnLogicOp.AND_BREAK_ON_FALSE);
+	private FastIterableDeque<PreJoinGameListener> preJoinGameListeners = new HandlerList<PreJoinGameListener>(PreJoinGameListener.class,
+		ReturnLogicOp.AND_BREAK_ON_FALSE);
+	private FastIterableDeque<PostLoginListener> postLoginListeners = new HandlerList<PostLoginListener>(PostLoginListener.class);
 
-    @Override
-    public void registerInterfaces(InterfaceRegistrationDelegate delegate)
-    {
-        super.registerInterfaces(delegate);
+	@Override
+	public void registerInterfaces(InterfaceRegistrationDelegate delegate) {
+		super.registerInterfaces(delegate);
 
-        delegate.registerInterface(JoinGameListener.class);
-        delegate.registerInterface(ChatListener.class);
-        delegate.registerInterface(ChatFilter.class);
-        delegate.registerInterface(PreJoinGameListener.class);
-        delegate.registerInterface(PostLoginListener.class);
-    }
+		delegate.registerInterface(JoinGameListener.class);
+		delegate.registerInterface(ChatListener.class);
+		delegate.registerInterface(ChatFilter.class);
+		delegate.registerInterface(PreJoinGameListener.class);
+		delegate.registerInterface(PostLoginListener.class);
+	}
 
-    /**
-     * @param joinGameListener
-     */
-    public void registerJoinGameListener(JoinGameListener joinGameListener)
-    {
-        this.joinGameListeners.add(joinGameListener);
-    }
+	/**
+	 * @param joinGameListener
+	 */
+	public void registerJoinGameListener(JoinGameListener joinGameListener) {
+		this.joinGameListeners.add(joinGameListener);
+	}
 
-    /**
-     * @param chatFilter
-     */
-    public void registerChatFilter(ChatFilter chatFilter)
-    {
-        this.chatFilters.add(chatFilter);
-    }
+	/**
+	 * @param chatFilter
+	 */
+	public void registerChatFilter(ChatFilter chatFilter) {
+		this.chatFilters.add(chatFilter);
+	}
 
-    /**
-     * @param chatListener
-     */
-    public void registerChatListener(ChatListener chatListener)
-    {
-        if (chatListener instanceof ChatFilter)
-        {
-            LiteLoaderLogger.warning("Interface error initialising mod '%1s'. A mod implementing ChatFilter and ChatListener is not supported! "
-                    + "Remove one of these interfaces", chatListener.getName());
-        }
-        else
-        {
-            this.chatListeners.add(chatListener);
-        }
-    }
+	/**
+	 * @param chatListener
+	 */
+	public void registerChatListener(ChatListener chatListener) {
+		if (chatListener instanceof ChatFilter) {
+			LiteLoaderLogger.warning("Interface error initialising mod '%1s'. A mod implementing ChatFilter and ChatListener is not supported! "
+				+ "Remove one of these interfaces", chatListener.getName());
+		} else {
+			this.chatListeners.add(chatListener);
+		}
+	}
 
-    /**
-     * @param joinGameListener
-     */
-    public void registerPreJoinGameListener(PreJoinGameListener joinGameListener)
-    {
-        this.preJoinGameListeners.add(joinGameListener);
-    }
+	/**
+	 * @param joinGameListener
+	 */
+	public void registerPreJoinGameListener(PreJoinGameListener joinGameListener) {
+		this.preJoinGameListeners.add(joinGameListener);
+	}
 
-    /**
-     * @param postLoginListener
-     */
-    public void registerPostLoginListener(PostLoginListener postLoginListener)
-    {
-        this.postLoginListeners.add(postLoginListener);
-    }
+	/**
+	 * @param postLoginListener
+	 */
+	public void registerPostLoginListener(PostLoginListener postLoginListener) {
+		this.postLoginListeners.add(postLoginListener);
+	}
 
-    public static void onJoinRealm(RealmsServer server)
-    {
-        PacketEventsClient.joiningRealm = server;
-    }
+	public static void onJoinRealm(RealmsServer server) {
+		PacketEventsClient.joiningRealm = server;
+	}
 
-    @Override
-    protected IThreadListener getPacketContextListener(Packets.Context context)
-    {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        if (context == Packets.Context.SERVER)
-        {
-            return minecraft.getIntegratedServer();
-        }
+	@Override
+	protected IThreadListener getPacketContextListener(Packets.Context context) {
+		Minecraft minecraft = Minecraft.getMinecraft();
+		if (context == Packets.Context.SERVER) {
+			return minecraft.getIntegratedServer();
+		}
 
-        return minecraft;
-    }
+		return minecraft;
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.core.PacketEvents#handlePacket(
-     *      com.mumfrey.liteloader.common.transformers.PacketEventInfo,
-     *      net.minecraft.network.INetHandler,
-     *      net.minecraft.network.play.server.SPacketJoinGame)
-     */
-    @Override
-    protected void handlePacket(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketJoinGame packet)
-    {
-        if (this.preJoinGame(e, netHandler, packet))
-        {
-            return;
-        }
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.core.PacketEvents#handlePacket(
+	 *      com.mumfrey.liteloader.common.transformers.PacketEventInfo,
+	 *      net.minecraft.network.INetHandler,
+	 *      net.minecraft.network.play.server.SPacketJoinGame)
+	 */
+	@Override
+	protected void handlePacket(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketJoinGame packet) {
+		if (this.preJoinGame(e, netHandler, packet)) {
+			return;
+		}
 
-        ((INetHandlerPlayClient)netHandler).handleJoinGame(packet);
-        super.handlePacket(e, netHandler, packet);
+		((INetHandlerPlayClient) netHandler).handleJoinGame(packet);
+		super.handlePacket(e, netHandler, packet);
 
-        this.postJoinGame(e, netHandler, packet);
-    }
+		this.postJoinGame(e, netHandler, packet);
+	}
 
-    /**
-     * @param e
-     * @param netHandler
-     * @param packet
-     * @throws EventCancellationException
-     */
-    private boolean preJoinGame(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketJoinGame packet) throws EventCancellationException
-    {
-        if (!(netHandler instanceof INetHandlerPlayClient))
-        {
-            return true;
-        }
+	/**
+	 * @param e
+	 * @param netHandler
+	 * @param packet
+	 * @throws EventCancellationException
+	 */
+	private boolean preJoinGame(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketJoinGame packet) throws EventCancellationException {
+		if (!(netHandler instanceof INetHandlerPlayClient)) {
+			return true;
+		}
 
-        e.cancel();
+		e.cancel();
 
-        return !this.preJoinGameListeners.all().onPreJoinGame(netHandler, packet);
-    }
+		return !this.preJoinGameListeners.all().onPreJoinGame(netHandler, packet);
+	}
 
-    /**
-     * @param e
-     * @param netHandler
-     * @param packet
-     */
-    private void postJoinGame(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketJoinGame packet)
-    {
-        this.joinGameListeners.all().onJoinGame(netHandler, packet, Minecraft.getMinecraft().getCurrentServerData(), PacketEventsClient.joiningRealm);
-        PacketEventsClient.joiningRealm = null;
+	/**
+	 * @param e
+	 * @param netHandler
+	 * @param packet
+	 */
+	private void postJoinGame(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketJoinGame packet) {
+		this.joinGameListeners.all().onJoinGame(netHandler, packet, Minecraft.getMinecraft().getCurrentServerData(), PacketEventsClient.joiningRealm);
+		PacketEventsClient.joiningRealm = null;
 
-        ClientPluginChannels clientPluginChannels = LiteLoader.getClientPluginChannels();
-        if (clientPluginChannels instanceof ClientPluginChannelsClient)
-        {
-            ((ClientPluginChannelsClient)clientPluginChannels).onJoinGame(netHandler, packet);
-        }
-    }
+		ClientPluginChannels clientPluginChannels = LiteLoader.getClientPluginChannels();
+		if (clientPluginChannels instanceof ClientPluginChannelsClient) {
+			((ClientPluginChannelsClient) clientPluginChannels).onJoinGame(netHandler, packet);
+		}
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.core.PacketEvents#handlePacket(
-     *      com.mumfrey.liteloader.common.transformers.PacketEventInfo,
-     *      net.minecraft.network.INetHandler,
-     *      net.minecraft.network.login.server.S02PacketLoginSuccess)
-     */
-    @Override
-    protected void handlePacket(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketLoginSuccess packet)
-    {
-        if (netHandler instanceof INetHandlerLoginClient)
-        {
-            INetHandlerLoginClient netHandlerLoginClient = (INetHandlerLoginClient)netHandler;
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.core.PacketEvents#handlePacket(
+	 *      com.mumfrey.liteloader.common.transformers.PacketEventInfo,
+	 *      net.minecraft.network.INetHandler,
+	 *      net.minecraft.network.login.server.S02PacketLoginSuccess)
+	 */
+	@Override
+	protected void handlePacket(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketLoginSuccess packet) {
+		if (netHandler instanceof INetHandlerLoginClient) {
+			INetHandlerLoginClient netHandlerLoginClient = (INetHandlerLoginClient) netHandler;
 
-            ClientPluginChannels clientPluginChannels = LiteLoader.getClientPluginChannels();
-            if (clientPluginChannels instanceof ClientPluginChannelsClient)
-            {
-                ((ClientPluginChannelsClient)clientPluginChannels).onPostLogin(netHandlerLoginClient, packet);
-            }
+			ClientPluginChannels clientPluginChannels = LiteLoader.getClientPluginChannels();
+			if (clientPluginChannels instanceof ClientPluginChannelsClient) {
+				((ClientPluginChannelsClient) clientPluginChannels).onPostLogin(netHandlerLoginClient, packet);
+			}
 
-            this.postLoginListeners.all().onPostLogin(netHandlerLoginClient, packet);
-        }
-    }
+			this.postLoginListeners.all().onPostLogin(netHandlerLoginClient, packet);
+		}
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.core.PacketEvents#handlePacket(
-     *      com.mumfrey.liteloader.common.transformers.PacketEventInfo,
-     *      net.minecraft.network.INetHandler,
-     *      net.minecraft.network.play.server.S02PacketChat)
-     */
-    @Override
-    protected void handlePacket(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketChat packet)
-    {
-        if (packet.getChatComponent() == null)
-        {
-            return;
-        }
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.core.PacketEvents#handlePacket(
+	 *      com.mumfrey.liteloader.common.transformers.PacketEventInfo,
+	 *      net.minecraft.network.INetHandler,
+	 *      net.minecraft.network.play.server.S02PacketChat)
+	 */
+	@Override
+	protected void handlePacket(PacketEventInfo<Packet<?>> e, INetHandler netHandler, SPacketChat packet) {
+		if (packet.getChatComponent() == null) {
+			return;
+		}
 
-        ITextComponent originalChat = packet.getChatComponent();
-        ITextComponent chat = originalChat;
-        String message = chat.getFormattedText();
+		ITextComponent originalChat = packet.getChatComponent();
+		ITextComponent chat = originalChat;
+		String message = chat.getFormattedText();
 
-        // Chat filters get a stab at the chat first, if any filter returns false the chat is discarded
-        for (ChatFilter chatFilter : this.chatFilters)
-        {
-            ReturnValue<ITextComponent> ret = new ReturnValue<ITextComponent>();
+		// Chat filters get a stab at the chat first, if any filter returns false the chat is discarded
+		for (ChatFilter chatFilter : this.chatFilters) {
+			ReturnValue<ITextComponent> ret = new ReturnValue<ITextComponent>();
 
-            if (chatFilter.onChat(chat, message, ret))
-            {
-                if (ret.isSet())
-                {
-                    chat = ret.get();
-                    if (chat == null)
-                    {
-                        chat = new TextComponentString("");
-                    }
-                    message = chat.getFormattedText();
-                }
-            }
-            else
-            {
-                e.cancel();
-                return;
-            }
-        }
+			if (chatFilter.onChat(chat, message, ret)) {
+				if (ret.isSet()) {
+					chat = ret.get();
+					if (chat == null) {
+						chat = new TextComponentString("");
+					}
+					message = chat.getFormattedText();
+				}
+			} else {
+				e.cancel();
+				return;
+			}
+		}
 
-        if (chat != originalChat)
-        {
-            try
-            {
-                chat = ChatUtilities.convertLegacyCodes(chat);
-                ((IChatPacket)packet).setChatComponent(chat);
-            }
-            catch (Exception ex)
-            {
-                ex.printStackTrace();
-            }
-        }
+		if (chat != originalChat) {
+			try {
+				chat = ChatUtilities.convertLegacyCodes(chat);
+				((IChatPacket) packet).setChatComponent(chat);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 
-        // Chat listeners get the chat if no filter removed it
-        this.chatListeners.all().onChat(chat, message);
-    }
+		// Chat listeners get the chat if no filter removed it
+		this.chatListeners.all().onChat(chat, message);
+	}
 }

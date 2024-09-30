@@ -15,13 +15,13 @@ import net.minecraft.client.network.NetHandlerLoginClient;
 import net.minecraft.network.NetworkManager;
 
 @Mixin(NetHandlerLoginClient.class)
-public abstract class MixinNetHandlerLoginClient implements IClientNetLoginHandler
-{
-    @Shadow @Final private NetworkManager networkManager;
-    
-    @Override
-    public NetworkManager getNetMgr()
-    {
-        return this.networkManager;
-    }
+public abstract class MixinNetHandlerLoginClient implements IClientNetLoginHandler {
+	@Shadow
+	@Final
+	private NetworkManager networkManager;
+
+	@Override
+	public NetworkManager getNetMgr() {
+		return this.networkManager;
+	}
 }

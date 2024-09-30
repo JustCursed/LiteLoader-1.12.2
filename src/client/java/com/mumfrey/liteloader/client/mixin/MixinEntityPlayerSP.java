@@ -16,16 +16,13 @@ import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 
 @Mixin(EntityPlayerSP.class)
-public abstract class MixinEntityPlayerSP extends AbstractClientPlayer
-{
-    public MixinEntityPlayerSP()
-    {
-        super(null, null);
-    }
-    
-    @Inject(method = "sendChatMessage(Ljava/lang/String;)V", at = { @At("HEAD") }, cancellable = true)
-    public void onSendChatMessage(String message, CallbackInfo ci)
-    {
-        LiteLoaderEventBrokerClient.getInstance().onSendChatMessage(ci, message);
-    }
+public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
+	public MixinEntityPlayerSP() {
+		super(null, null);
+	}
+
+	@Inject(method = "sendChatMessage(Ljava/lang/String;)V", at = {@At("HEAD")}, cancellable = true)
+	public void onSendChatMessage(String message, CallbackInfo ci) {
+		LiteLoaderEventBrokerClient.getInstance().onSendChatMessage(ci, message);
+	}
 }

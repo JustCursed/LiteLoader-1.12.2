@@ -16,40 +16,34 @@ import com.mumfrey.liteloader.client.ducks.IFramebuffer;
 import net.minecraft.client.shader.Framebuffer;
 
 @Mixin(Framebuffer.class)
-public abstract class MixinFramebuffer implements IFramebuffer
-{
-    private LiteLoaderEventBrokerClient broker;
-    
-    private boolean dispatchRenderEvent;
-    
-    @Override
-    public IFramebuffer setDispatchRenderEvent(boolean dispatchRenderEvent)
-    {
-        this.dispatchRenderEvent = dispatchRenderEvent;
-        return this;
-    }
-    
-    @Override
-    public boolean isDispatchRenderEvent()
-    {
-        return this.dispatchRenderEvent;
-    }
-    
-    @Inject(method = "framebufferRenderExt(IIZ)V", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/shader/Framebuffer;bindFramebufferTexture()V"
-    ))
-    private void onRenderFBO(int width, int height, boolean flag, CallbackInfo ci)
-    {
-        if (this.broker == null)
-        {
-            this.broker = LiteLoaderEventBrokerClient.getInstance();
-        }
-        
-        if (this.dispatchRenderEvent && this.broker != null)
-        {
-            this.broker.onRenderFBO((Framebuffer)(Object)this, width, height);
-        }
-        this.dispatchRenderEvent = false;
-    }
+public abstract class MixinFramebuffer implements IFramebuffer {
+	private LiteLoaderEventBrokerClient broker;
+
+	private boolean dispatchRenderEvent;
+
+	@Override
+	public IFramebuffer setDispatchRenderEvent(boolean dispatchRenderEvent) {
+		this.dispatchRenderEvent = dispatchRenderEvent;
+		return this;
+	}
+
+	@Override
+	public boolean isDispatchRenderEvent() {
+		return this.dispatchRenderEvent;
+	}
+
+	@Inject(method = "framebufferRenderExt(IIZ)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/shader/Framebuffer;bindFramebufferTexture()V"
+	))
+	private void onRenderFBO(int width, int height, boolean flag, CallbackInfo ci) {
+		if (this.broker == null) {
+			this.broker = LiteLoaderEventBrokerClient.getInstance();
+		}
+
+		if (this.dispatchRenderEvent && this.broker != null) {
+			this.broker.onRenderFBO((Framebuffer) (Object) this, width, height);
+		}
+		this.dispatchRenderEvent = false;
+	}
 }

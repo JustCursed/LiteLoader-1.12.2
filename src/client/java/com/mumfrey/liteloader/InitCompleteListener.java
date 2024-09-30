@@ -16,14 +16,13 @@ import net.minecraft.client.Minecraft;
  *
  * @author Adam Mummery-Smith
  */
-public interface InitCompleteListener extends LiteMod
-{
-    /**
-     * Called as soon as the game is initialised and the main game loop is
-     * running.
-     * 
-     * @param minecraft Minecraft instance
-     * @param loader LiteLoader instance
-     */
-    public abstract void onInitCompleted(Minecraft minecraft, LiteLoader loader);
+public interface InitCompleteListener extends LiteMod {
+	/**
+	 * Called as soon as the game is initialised and the main game loop is
+	 * running.
+	 *
+	 * @param minecraft Minecraft instance
+	 * @param loader    LiteLoader instance
+	 */
+	public abstract void onInitCompleted(Minecraft minecraft, LiteLoader loader);
 }

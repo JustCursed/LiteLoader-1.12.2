@@ -9,11 +9,9 @@ import java.util.Deque;
 
 /**
  * Deque interface which is FastIterable
- * 
- * @author Adam Mummery-Smith
  *
  * @param <T>
+ * @author Adam Mummery-Smith
  */
-public interface FastIterableDeque<T> extends FastIterable<T>, Deque<T>
-{
+public interface FastIterableDeque<T> extends FastIterable<T>, Deque<T> {
 }

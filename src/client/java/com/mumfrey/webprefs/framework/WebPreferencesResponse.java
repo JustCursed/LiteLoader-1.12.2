@@ -12,123 +12,110 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.mumfrey.webprefs.interfaces.IWebPreferencesResponse;
 
-class WebPreferencesResponse implements IWebPreferencesResponse
-{
-    private static final long serialVersionUID = 1L;
-    
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    
-    @Expose @SerializedName("response")
-    private String response;
+class WebPreferencesResponse implements IWebPreferencesResponse {
+	private static final long serialVersionUID = 1L;
 
-    @Expose @SerializedName("message")
-    private String message;
+	private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    @Expose @SerializedName("uuid")
-    private String uuid;
+	@Expose
+	@SerializedName("response")
+	private String response;
 
-    @Expose @SerializedName("serverid")
-    private String serverId;
+	@Expose
+	@SerializedName("message")
+	private String message;
 
-    @Expose @SerializedName("rate")
-    private int rateLimit;
+	@Expose
+	@SerializedName("uuid")
+	private String uuid;
 
-    @Expose @SerializedName("get")
-    private Map<String, String> get;
+	@Expose
+	@SerializedName("serverid")
+	private String serverId;
 
-    @Expose @SerializedName("set")
-    private List<String> set;
+	@Expose
+	@SerializedName("rate")
+	private int rateLimit;
 
-    private transient Throwable th;
+	@Expose
+	@SerializedName("get")
+	private Map<String, String> get;
 
-    public WebPreferencesResponse() {}
+	@Expose
+	@SerializedName("set")
+	private List<String> set;
 
-    private WebPreferencesResponse(String response, Throwable th)
-    {
-        this.response = response;
-        this.th = th;
-    }
+	private transient Throwable th;
 
-    @Override
-    public String getResponse()
-    {
-        return this.response;
-    }
+	public WebPreferencesResponse() {
+	}
 
-    @Override
-    public String getMessage()
-    {
-        return this.message;
-    }
+	private WebPreferencesResponse(String response, Throwable th) {
+		this.response = response;
+		this.th = th;
+	}
 
-    @Override
-    public Throwable getThrowable()
-    {
-        return this.th;
-    }
+	@Override
+	public String getResponse() {
+		return this.response;
+	}
 
-    @Override
-    public String getUUID()
-    {
-        return this.uuid;
-    }
+	@Override
+	public String getMessage() {
+		return this.message;
+	}
 
-    @Override
-    public String getServerId()
-    {
-        return this.serverId;
-    }
+	@Override
+	public Throwable getThrowable() {
+		return this.th;
+	}
 
-    @Override
-    public boolean hasValues()
-    {
-        return this.get != null;
-    }
+	@Override
+	public String getUUID() {
+		return this.uuid;
+	}
 
-    @Override
-    public Map<String, String> getValues()
-    {
-        return this.get;
-    }
+	@Override
+	public String getServerId() {
+		return this.serverId;
+	}
 
-    @Override
-    public boolean hasSetters()
-    {
-        return this.set != null;
-    }
+	@Override
+	public boolean hasValues() {
+		return this.get != null;
+	}
 
-    @Override
-    public Set<String> getSetters()
-    {
-        return new HashSet<String>(this.set);
-    }
+	@Override
+	public Map<String, String> getValues() {
+		return this.get;
+	}
 
-    public static IWebPreferencesResponse fromJson(String json)
-    {
-        try
-        {
-            return WebPreferencesResponse.gson.fromJson(json, WebPreferencesResponse.class);
-        }
-        catch (JsonSyntaxException ex)
-        {
-            return new WebPreferencesResponse("500 Invalid JSON", ex);
-        }
-        catch (Throwable th)
-        {
-            return new WebPreferencesResponse("500 Invalid JSON", th);
-        }
-    }
+	@Override
+	public boolean hasSetters() {
+		return this.set != null;
+	}
 
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return WebPreferencesResponse.gson.toJson(this);
-        }
-        catch (Throwable th)
-        {
-            return "{\"Invalid JSON\"}";
-        }
-    }
+	@Override
+	public Set<String> getSetters() {
+		return new HashSet<String>(this.set);
+	}
+
+	public static IWebPreferencesResponse fromJson(String json) {
+		try {
+			return WebPreferencesResponse.gson.fromJson(json, WebPreferencesResponse.class);
+		} catch (JsonSyntaxException ex) {
+			return new WebPreferencesResponse("500 Invalid JSON", ex);
+		} catch (Throwable th) {
+			return new WebPreferencesResponse("500 Invalid JSON", th);
+		}
+	}
+
+	@Override
+	public String toString() {
+		try {
+			return WebPreferencesResponse.gson.toJson(this);
+		} catch (Throwable th) {
+			return "{\"Invalid JSON\"}";
+		}
+	}
 }

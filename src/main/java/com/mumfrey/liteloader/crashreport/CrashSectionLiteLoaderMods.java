@@ -9,28 +9,22 @@ import com.mumfrey.liteloader.core.LiteLoader;
 
 import net.minecraft.crash.CrashReport;
 
-public class CrashSectionLiteLoaderMods
-{
-    final CrashReport crashReport;
+public class CrashSectionLiteLoaderMods {
+	final CrashReport crashReport;
 
-    public CrashSectionLiteLoaderMods(CrashReport report)
-    {
-        this.crashReport = report;
-    }
+	public CrashSectionLiteLoaderMods(CrashReport report) {
+		this.crashReport = report;
+	}
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return LiteLoader.getInstance().getLoadedModsList();
-        }
-        catch (Exception ex)
-        {
-            return "LiteLoader startup incomplete";
-        }
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		try {
+			return LiteLoader.getInstance().getLoadedModsList();
+		} catch (Exception ex) {
+			return "LiteLoader startup incomplete";
+		}
+	}
 }

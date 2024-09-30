@@ -5,49 +5,42 @@
  */
 package com.mumfrey.liteloader.core.api;
 
-import java.util.List;
-
 import com.mumfrey.liteloader.api.ModClassValidator;
 
-public class DefaultClassValidator<T> implements ModClassValidator
-{
-    private final Class<T> superClass;
+import java.util.List;
 
-    private final List<String> supportedPrefixes;
+public class DefaultClassValidator<T> implements ModClassValidator {
+	private final Class<T> superClass;
 
-    public DefaultClassValidator(Class<T> superClass, List<String> supportedPrefixes)
-    {
-        this.supportedPrefixes = supportedPrefixes;
-        this.superClass = superClass;
-    }
+	private final List<String> supportedPrefixes;
 
-    @Override
-    public boolean validateName(String className)
-    {
-        return this.supportedPrefixes == null
-                || this.supportedPrefixes.size() == 0
-                || DefaultClassValidator.startsWithAny(className, this.supportedPrefixes);
-    }
+	public DefaultClassValidator(Class<T> superClass, List<String> supportedPrefixes) {
+		this.supportedPrefixes = supportedPrefixes;
+		this.superClass = superClass;
+	}
 
-    @Override
-    public boolean validateClass(ClassLoader classLoader, Class<?> candidateClass)
-    {
-        return (candidateClass != null
-                && !this.superClass.equals(candidateClass)
-                && this.superClass.isAssignableFrom(candidateClass)
-                && !candidateClass.isInterface());
-    }
+	@Override
+	public boolean validateName(String className) {
+		return this.supportedPrefixes == null
+			|| this.supportedPrefixes.size() == 0
+			|| DefaultClassValidator.startsWithAny(className, this.supportedPrefixes);
+	}
 
-    private static boolean startsWithAny(String string, List<String> candidates)
-    {
-        for (String candidate : candidates)
-        {
-            if (string.startsWith(candidate))
-            {
-                return true;
-            }
-        }
+	@Override
+	public boolean validateClass(ClassLoader classLoader, Class<?> candidateClass) {
+		return (candidateClass != null
+			&& !this.superClass.equals(candidateClass)
+			&& this.superClass.isAssignableFrom(candidateClass)
+			&& !candidateClass.isInterface());
+	}
 
-        return false;
-    }
+	private static boolean startsWithAny(String string, List<String> candidates) {
+		for (String candidate : candidates) {
+			if (string.startsWith(candidate)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

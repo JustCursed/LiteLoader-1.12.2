@@ -10,7 +10,6 @@ import java.util.Map;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 
-public interface ITileEntityRendererDispatcher
-{
-    public abstract Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> getSpecialRenderMap();
+public interface ITileEntityRendererDispatcher {
+	public abstract Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> getSpecialRenderMap();
 }

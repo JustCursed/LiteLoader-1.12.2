@@ -15,12 +15,11 @@ import com.mumfrey.liteloader.core.runtime.Obf;
 /**
  * Defines the obfuscation table class to use for an accessor injection
  * interface.
- * 
+ *
  * @author Adam Mummery-Smith
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
-public @interface ObfTableClass
-{
-    public Class<? extends Obf> value();
+public @interface ObfTableClass {
+	public Class<? extends Obf> value();
 }

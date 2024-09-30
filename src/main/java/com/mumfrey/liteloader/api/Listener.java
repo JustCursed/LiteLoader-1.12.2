@@ -12,16 +12,15 @@ package com.mumfrey.liteloader.api;
  * actual implementors consume the events thus advertised by implementing those
  * interfaces, making them themselves the consumers. Okay so that's probably
  * pretty confusing but I can't think of any better terminology so it's
- * staying :) 
- * 
+ * staying :)
+ *
  * @author Adam Mummery-Smith
  */
-public interface Listener
-{
-    /**
-     * Get the display name
-     * 
-     * @return display name
-     */
-    public abstract String getName();
+public interface Listener {
+	/**
+	 * Get the display name
+	 *
+	 * @return display name
+	 */
+	public abstract String getName();
 }

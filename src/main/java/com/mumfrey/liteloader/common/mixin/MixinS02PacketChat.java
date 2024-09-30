@@ -14,19 +14,17 @@ import net.minecraft.network.play.server.SPacketChat;
 import net.minecraft.util.text.ITextComponent;
 
 @Mixin(SPacketChat.class)
-public abstract class MixinS02PacketChat implements IChatPacket
-{
-    @Shadow private ITextComponent chatComponent;
-    
-    @Override
-    public ITextComponent getChatComponent()
-    {
-        return this.chatComponent;
-    }
-    
-    @Override
-    public void setChatComponent(ITextComponent chatComponent)
-    {
-        this.chatComponent = chatComponent;
-    }
+public abstract class MixinS02PacketChat implements IChatPacket {
+	@Shadow
+	private ITextComponent chatComponent;
+
+	@Override
+	public ITextComponent getChatComponent() {
+		return this.chatComponent;
+	}
+
+	@Override
+	public void setChatComponent(ITextComponent chatComponent) {
+		this.chatComponent = chatComponent;
+	}
 }

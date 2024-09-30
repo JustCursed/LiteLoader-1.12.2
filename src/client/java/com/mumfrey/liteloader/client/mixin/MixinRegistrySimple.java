@@ -16,15 +16,16 @@ import com.mumfrey.liteloader.client.ducks.IMutableRegistry;
 import net.minecraft.util.registry.RegistrySimple;
 
 @Mixin(RegistrySimple.class)
-public abstract class MixinRegistrySimple<K, V> implements IMutableRegistry<K, V>
-{
-    @Shadow private Object[] values;
-    @Shadow @Final protected Map<K, V> registryObjects;
-    
-    @Override
-    public V removeObjectFromRegistry(K key)
-    {
-        this.values = null;
-        return this.registryObjects.remove(key);
-    }
+public abstract class MixinRegistrySimple<K, V> implements IMutableRegistry<K, V> {
+	@Shadow
+	private Object[] values;
+	@Shadow
+	@Final
+	protected Map<K, V> registryObjects;
+
+	@Override
+	public V removeObjectFromRegistry(K key) {
+		this.values = null;
+		return this.registryObjects.remove(key);
+	}
 }

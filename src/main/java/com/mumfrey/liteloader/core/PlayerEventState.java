@@ -5,12 +5,9 @@
  */
 package com.mumfrey.liteloader.core;
 
-import java.lang.ref.WeakReference;
-
 import com.mumfrey.liteloader.PlayerInteractionListener.MouseButton;
 import com.mumfrey.liteloader.core.LiteLoaderEventBroker.InteractType;
 import com.mumfrey.liteloader.util.EntityUtilities;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -20,152 +17,132 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 
-public class PlayerEventState implements IEventState
-{
-    private static long MISS = new BlockPos(-1, -1, -1).toLong();
+import java.lang.ref.WeakReference;
 
-    private WeakReference<EntityPlayerMP> playerRef;
+public class PlayerEventState implements IEventState {
+	private static long MISS = new BlockPos(-1, -1, -1).toLong();
 
-    private final LiteLoaderEventBroker<?, ?> broker;
+	private WeakReference<EntityPlayerMP> playerRef;
 
-    private double traceDistance = 256.0;
+	private final LiteLoaderEventBroker<?, ?> broker;
 
-    private int suppressLeftTicks; 
-    private int suppressRightTicks; 
-    private boolean leftClick;
-    private boolean rightClick;
-    private boolean digging;
-    
-    private EnumHand hand = EnumHand.MAIN_HAND;
+	private double traceDistance = 256.0;
 
-    private RayTraceResult hit;
+	private int suppressLeftTicks;
+	private int suppressRightTicks;
+	private boolean leftClick;
+	private boolean rightClick;
+	private boolean digging;
 
-    private String locale = "en_US";
+	private EnumHand hand = EnumHand.MAIN_HAND;
 
-    public PlayerEventState(EntityPlayerMP player, LiteLoaderEventBroker<?, ?> broker)
-    {
-        this.playerRef = new WeakReference<EntityPlayerMP>(player);
-        this.broker = broker;
-    }
+	private RayTraceResult hit;
 
-    public void setTraceDistance(int renderDistance)
-    {
-        this.traceDistance = renderDistance * 16.0;
-    }
+	private String locale = "en_US";
 
-    public double getTraceDistance()
-    {
-        return this.traceDistance;
-    }
+	public PlayerEventState(EntityPlayerMP player, LiteLoaderEventBroker<?, ?> broker) {
+		this.playerRef = new WeakReference<EntityPlayerMP>(player);
+		this.broker = broker;
+	}
 
-    public void setLocale(String lang)
-    {
-        if (lang.matches("^[a-z]{2}_[A-Z]{2}$"))
-        {
-            this.locale = lang;
-        }
-    }
+	public void setTraceDistance(int renderDistance) {
+		this.traceDistance = renderDistance * 16.0;
+	}
 
-    public String getLocale()
-    {
-        return this.locale;
-    }
+	public double getTraceDistance() {
+		return this.traceDistance;
+	}
 
-    public EntityPlayerMP getPlayer()
-    {
-        return this.playerRef.get();
-    }
+	public void setLocale(String lang) {
+		if (lang.matches("^[a-z]{2}_[A-Z]{2}$")) {
+			this.locale = lang;
+		}
+	}
 
-    public void onSpawned()
-    {
-    }
+	public String getLocale() {
+		return this.locale;
+	}
 
-    @Override
-    public void onTick(MinecraftServer server)
-    {
-        if (this.leftClick && this.suppressLeftTicks == 0 && !this.digging)
-        {
-            this.broker.onPlayerClickedAir(this.getPlayer(), MouseButton.LEFT, this.hand,
-                    this.hit.getBlockPos(), this.hit.sideHit, this.hit.typeOfHit);
-        }
+	public EntityPlayerMP getPlayer() {
+		return this.playerRef.get();
+	}
 
-        if (this.rightClick && this.suppressRightTicks == 0)
-        {
-            this.broker.onPlayerClickedAir(this.getPlayer(), MouseButton.RIGHT, this.hand,
-                    this.hit.getBlockPos(), this.hit.sideHit,  this.hit.typeOfHit);
-        }
+	public void onSpawned() {
+	}
 
-        if (this.suppressLeftTicks > 0) this.suppressLeftTicks--;
-        if (this.suppressRightTicks > 0) this.suppressRightTicks--;
+	@Override
+	public void onTick(MinecraftServer server) {
+		if (this.leftClick && this.suppressLeftTicks == 0 && !this.digging) {
+			this.broker.onPlayerClickedAir(this.getPlayer(), MouseButton.LEFT, this.hand,
+				this.hit.getBlockPos(), this.hit.sideHit, this.hit.typeOfHit);
+		}
 
-        this.leftClick = false;
-        this.rightClick = false;
-    }
+		if (this.rightClick && this.suppressRightTicks == 0) {
+			this.broker.onPlayerClickedAir(this.getPlayer(), MouseButton.RIGHT, this.hand,
+				this.hit.getBlockPos(), this.hit.sideHit, this.hit.typeOfHit);
+		}
 
-    public boolean onPlayerInteract(InteractType action, EntityPlayerMP player, EnumHand hand, ItemStack stack, BlockPos position, EnumFacing side)
-    {
-        if (action == InteractType.DIG_BLOCK_MAYBE && !player.isCreative())
-        {
-            this.digging = true;
-        }
-        
-        if (action == InteractType.DIG_BLOCK_END)
-        {
-            this.digging = false;
-            this.suppressLeftTicks++;
-            return true;
-        }
-        
-        this.hit = EntityUtilities.rayTraceFromEntity(player, this.traceDistance, 0.0F);
+		if (this.suppressLeftTicks > 0) this.suppressLeftTicks--;
+		if (this.suppressRightTicks > 0) this.suppressRightTicks--;
 
-        if (action == InteractType.LEFT_CLICK)
-        {
-            this.leftClick = true;
-            this.hand = hand;
-            return true;
-        }
+		this.leftClick = false;
+		this.rightClick = false;
+	}
 
-        if (action == InteractType.RIGHT_CLICK)
-        {
-            this.digging = false;
-            this.hand = hand;
-            this.rightClick = true;
-            return true;
-        }
+	public boolean onPlayerInteract(InteractType action, EntityPlayerMP player, EnumHand hand, ItemStack stack, BlockPos position, EnumFacing side) {
+		if (action == InteractType.DIG_BLOCK_MAYBE && !player.isCreative()) {
+			this.digging = true;
+		}
 
-        if ((action == InteractType.LEFT_CLICK_BLOCK || action == InteractType.DIG_BLOCK_MAYBE) && this.suppressLeftTicks == 0)
-        {
-            this.suppressLeftTicks += 2;
-            return this.broker.onPlayerClickedBlock(player, MouseButton.LEFT, hand, stack, position, side);
-        }
+		if (action == InteractType.DIG_BLOCK_END) {
+			this.digging = false;
+			this.suppressLeftTicks++;
+			return true;
+		}
 
-        if (action == InteractType.PLACE_BLOCK_MAYBE)
-        {
-            this.digging = false;
+		this.hit = EntityUtilities.rayTraceFromEntity(player, this.traceDistance, 0.0F);
 
-            if (this.suppressRightTicks > 0 && (this.suppressRightTicks != 1 && hand != this.hand))
-            {
-                return true;
-            }
+		if (action == InteractType.LEFT_CLICK) {
+			this.leftClick = true;
+			this.hand = hand;
+			return true;
+		}
 
-            if (position.toLong() == PlayerEventState.MISS)
-            {
-                RayTraceResult actualHit = EntityUtilities.rayTraceFromEntity(player, player.capabilities.isCreativeMode ? 5.0 : 4.5, 0.0F);
-                if (actualHit.typeOfHit == Type.MISS)
-                {
-                    this.digging = false;
-                    this.hand = hand;
-                    this.rightClick = true;
-                    return true;
-                }
-            }
+		if (action == InteractType.RIGHT_CLICK) {
+			this.digging = false;
+			this.hand = hand;
+			this.rightClick = true;
+			return true;
+		}
 
-            this.hand = hand;
-            this.suppressRightTicks++;
-            this.suppressLeftTicks++;
-            return this.broker.onPlayerClickedBlock(player, MouseButton.RIGHT, hand, stack, position, side);
-        }
+		if ((action == InteractType.LEFT_CLICK_BLOCK || action == InteractType.DIG_BLOCK_MAYBE) && this.suppressLeftTicks == 0) {
+			this.suppressLeftTicks += 2;
+			return this.broker.onPlayerClickedBlock(player, MouseButton.LEFT, hand, stack, position, side);
+		}
 
-        return true;
-    }
+		if (action == InteractType.PLACE_BLOCK_MAYBE) {
+			this.digging = false;
+
+			if (this.suppressRightTicks > 0 && (this.suppressRightTicks != 1 && hand != this.hand)) {
+				return true;
+			}
+
+			if (position.toLong() == PlayerEventState.MISS) {
+				RayTraceResult actualHit = EntityUtilities.rayTraceFromEntity(player, player.capabilities.isCreativeMode ? 5.0 : 4.5, 0.0F);
+				if (actualHit.typeOfHit == Type.MISS) {
+					this.digging = false;
+					this.hand = hand;
+					this.rightClick = true;
+					return true;
+				}
+			}
+
+			this.hand = hand;
+			this.suppressRightTicks++;
+			this.suppressLeftTicks++;
+			return this.broker.onPlayerClickedBlock(player, MouseButton.RIGHT, hand, stack, position, side);
+		}
+
+		return true;
+	}
 }

@@ -9,20 +9,17 @@ import com.mumfrey.liteloader.transformers.event.EventInfo;
 
 import net.minecraft.network.Packet;
 
-public class PacketEventInfo<S extends Packet<?>> extends EventInfo<S>
-{
-    private final int packetId;
+public class PacketEventInfo<S extends Packet<?>> extends EventInfo<S> {
+	private final int packetId;
 
-    @SuppressWarnings("unchecked")
-    public PacketEventInfo(String name, Object source, boolean cancellable, int packetId)
-    {
-        super(name, (S)source, cancellable);
+	@SuppressWarnings("unchecked")
+	public PacketEventInfo(String name, Object source, boolean cancellable, int packetId) {
+		super(name, (S) source, cancellable);
 
-        this.packetId = packetId;
-    }
+		this.packetId = packetId;
+	}
 
-    public int getPacketId()
-    {
-        return this.packetId;
-    }
+	public int getPacketId() {
+		return this.packetId;
+	}
 }

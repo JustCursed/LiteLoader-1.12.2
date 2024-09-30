@@ -17,13 +17,12 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 
 @Mixin(TileEntityRendererDispatcher.class)
-public abstract class MixinTileEntityRendererDispatcher implements ITileEntityRendererDispatcher
-{
-    @Shadow private Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> renderers;
-    
-    @Override
-    public Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> getSpecialRenderMap()
-    {
-        return this.renderers;
-    }
+public abstract class MixinTileEntityRendererDispatcher implements ITileEntityRendererDispatcher {
+	@Shadow
+	private Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> renderers;
+
+	@Override
+	public Map<Class<? extends TileEntity>, TileEntitySpecialRenderer<? extends TileEntity>> getSpecialRenderMap() {
+		return this.renderers;
+	}
 }

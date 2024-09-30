@@ -17,14 +17,12 @@ import com.mumfrey.liteloader.client.PacketEventsClient;
 import net.minecraft.realms.RealmsScreen;
 
 @Mixin(value = RealmsMainScreen.class, remap = false)
-public abstract class MixinRealmsMainScreen extends RealmsScreen
-{
-    @Inject(
-        method = "play(Lcom/mojang/realmsclient/dto/RealmsServer;Lnet/minecraft/realms/RealmsScreen;)V",
-        at = @At("HEAD")
-    )
-    private void onJoinRealm(RealmsServer server, RealmsScreen screen, CallbackInfo ci)
-    {
-        PacketEventsClient.onJoinRealm(server);
-    }
+public abstract class MixinRealmsMainScreen extends RealmsScreen {
+	@Inject(
+		method = "play(Lcom/mojang/realmsclient/dto/RealmsServer;Lnet/minecraft/realms/RealmsScreen;)V",
+		at = @At("HEAD")
+	)
+	private void onJoinRealm(RealmsServer server, RealmsScreen screen, CallbackInfo ci) {
+		PacketEventsClient.onJoinRealm(server);
+	}
 }

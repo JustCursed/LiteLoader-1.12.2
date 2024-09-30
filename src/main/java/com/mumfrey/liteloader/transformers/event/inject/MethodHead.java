@@ -15,19 +15,16 @@ import com.mumfrey.liteloader.transformers.event.InjectionPoint;
 
 /**
  * An injection point which locates the first instruction in a method body
- *  
+ *
  * @author Adam Mummery-Smith
  */
-public class MethodHead extends InjectionPoint
-{
-    public MethodHead()
-    {
-    }
+public class MethodHead extends InjectionPoint {
+	public MethodHead() {
+	}
 
-    @Override
-    public boolean find(String desc, InsnList insns, Collection<AbstractInsnNode> nodes, Event event)
-    {
-        nodes.add(insns.getFirst());
-        return true;
-    }
+	@Override
+	public boolean find(String desc, InsnList insns, Collection<AbstractInsnNode> nodes, Event event) {
+		nodes.add(insns.getFirst());
+		return true;
+	}
 }

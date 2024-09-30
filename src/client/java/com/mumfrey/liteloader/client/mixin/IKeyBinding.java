@@ -14,11 +14,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.client.settings.KeyBinding;
 
 @Mixin(KeyBinding.class)
-public interface IKeyBinding
-{
-    @Accessor(value = "CATEGORY_ORDER")
-    public static Map<String, Integer> getCategorySort()
-    {
-        throw new NotImplementedException("IKeyBinding mixin failed to apply");
-    }
+public interface IKeyBinding {
+	@Accessor(value = "CATEGORY_ORDER")
+	public static Map<String, Integer> getCategorySort() {
+		throw new NotImplementedException("IKeyBinding mixin failed to apply");
+	}
 }

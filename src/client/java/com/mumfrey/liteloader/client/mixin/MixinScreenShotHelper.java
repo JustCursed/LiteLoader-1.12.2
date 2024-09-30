@@ -19,21 +19,19 @@ import net.minecraft.util.ScreenShotHelper;
 import net.minecraft.util.text.ITextComponent;
 
 @Mixin(ScreenShotHelper.class)
-public abstract class MixinScreenShotHelper
-{
-    @Inject(
-        method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;IILnet/minecraft/client/shader/Framebuffer;)"
-                + "Lnet/minecraft/util/text/ITextComponent;",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/util/ScreenShotHelper;createScreenshot(IILnet/minecraft/client/shader/Framebuffer;)"
-                    + "Ljava/awt/image/BufferedImage;",
-            ordinal = 0
-        ),
-        cancellable = true
-    )
-    private static void onSaveScreenshot(File gameDir, String name, int width, int height, Framebuffer fbo, CallbackInfoReturnable<ITextComponent> ci)
-    {
-        LiteLoaderEventBrokerClient.getInstance().onScreenshot(ci, name, width, height, fbo);
-    }
+public abstract class MixinScreenShotHelper {
+	@Inject(
+		method = "saveScreenshot(Ljava/io/File;Ljava/lang/String;IILnet/minecraft/client/shader/Framebuffer;)"
+			+ "Lnet/minecraft/util/text/ITextComponent;",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/util/ScreenShotHelper;createScreenshot(IILnet/minecraft/client/shader/Framebuffer;)"
+				+ "Ljava/awt/image/BufferedImage;",
+			ordinal = 0
+		),
+		cancellable = true
+	)
+	private static void onSaveScreenshot(File gameDir, String name, int width, int height, Framebuffer fbo, CallbackInfoReturnable<ITextComponent> ci) {
+		LiteLoaderEventBrokerClient.getInstance().onScreenshot(ci, name, width, height, fbo);
+	}
 }

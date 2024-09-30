@@ -16,145 +16,121 @@ import com.mumfrey.webprefs.interfaces.IWebPreferencesRequest;
 import com.mumfrey.webprefs.interfaces.IWebPreferencesResponse;
 import com.mumfrey.webprefs.interfaces.IWebPreferencesServiceDelegate;
 
-abstract class WebPreferencesRequestAbstract implements IWebPreferencesRequest
-{
-    private static final long serialVersionUID = 1L;
+abstract class WebPreferencesRequestAbstract implements IWebPreferencesRequest {
+	private static final long serialVersionUID = 1L;
 
-    private static final Pattern keyPattern = Pattern.compile("^[a-z0-9_\\-\\.]{1,32}$");
+	private static final Pattern keyPattern = Pattern.compile("^[a-z0-9_\\-\\.]{1,32}$");
 
-    private static final Gson gson = new Gson();
+	private static final Gson gson = new Gson();
 
-    private final transient URI uri;
+	private final transient URI uri;
 
-    private final transient IWebPreferencesServiceDelegate delegate;
-    
-    private final transient String uuid;
+	private final transient IWebPreferencesServiceDelegate delegate;
 
-    public WebPreferencesRequestAbstract(IWebPreferencesServiceDelegate delegate, String uuid)
-    {
-        if (delegate == null)
-        {
-            throw new IllegalArgumentException("Attempted to create a request with no delegate");
-        }
+	private final transient String uuid;
 
-        this.uri = URI.create(String.format("http://%s%s", delegate.getHostName(), this.getPath()));
+	public WebPreferencesRequestAbstract(IWebPreferencesServiceDelegate delegate, String uuid) {
+		if (delegate == null) {
+			throw new IllegalArgumentException("Attempted to create a request with no delegate");
+		}
 
-        this.delegate = delegate;
-        this.uuid = uuid;
-    }
+		this.uri = URI.create(String.format("http://%s%s", delegate.getHostName(), this.getPath()));
 
-    protected abstract String getPath();
-    
-    @Override
-    public IWebPreferencesServiceDelegate getDelegate()
-    {
-        return this.delegate;
-    }
+		this.delegate = delegate;
+		this.uuid = uuid;
+	}
 
-    @Override
-    public URI getRequestURI()
-    {
-        return this.uri;
-    }
+	protected abstract String getPath();
 
-    @Override
-    public String getUUID()
-    {
-        return this.uuid;
-    }
+	@Override
+	public IWebPreferencesServiceDelegate getDelegate() {
+		return this.delegate;
+	}
 
-    @Override
-    public Map<String, String> getPostVars()
-    {
-        Map<String, String> params = new HashMap<String, String>();
-        this.addParams(params);
-        return params;
-    }
+	@Override
+	public URI getRequestURI() {
+		return this.uri;
+	}
 
-    protected void addParams(Map<String, String> params)
-    {
-        if (this.isValidationRequired())
-        {
-            Session session = this.getDelegate().getSession();
-            if (session == null)
-            {
-                throw new InvalidRequestException(RequestFailureReason.NO_SESSION, "Request has no session");
-            }
+	@Override
+	public String getUUID() {
+		return this.uuid;
+	}
 
-            params.put("u", session.getUsername());
-        }
+	@Override
+	public Map<String, String> getPostVars() {
+		Map<String, String> params = new HashMap<String, String>();
+		this.addParams(params);
+		return params;
+	}
 
-        params.put("i", this.uuid);
-        params.put("j", this.toJson());
-    }
-    
-    @Override
-    public final void onReceivedResponse(IWebPreferencesResponse response)
-    {
-        if (response == null)
-        {
-            throw new InvalidResponseException(null, "Error reading server response");
-        }
-        
-        if (response.getResponse().startsWith("500"))
-        {
-            throw new InvalidResponseException(RequestFailureReason.SERVER_ERROR,
-                    "The server returned an invalid resonse: " + response.getResponse(), response.getThrowable());
-        }
+	protected void addParams(Map<String, String> params) {
+		if (this.isValidationRequired()) {
+			Session session = this.getDelegate().getSession();
+			if (session == null) {
+				throw new InvalidRequestException(RequestFailureReason.NO_SESSION, "Request has no session");
+			}
 
-        if (!response.getResponse().startsWith("200"))
-        {
-            RequestFailureReason reason = RequestFailureReason.UNKNOWN;
+			params.put("u", session.getUsername());
+		}
 
-            if (response.getResponse().startsWith("429")) reason = RequestFailureReason.THROTTLED;
-            if (response.getResponse().startsWith("401")) reason = RequestFailureReason.UNAUTHORISED;
+		params.put("i", this.uuid);
+		params.put("j", this.toJson());
+	}
 
-            String message = response.getMessage();
-            throw new InvalidResponseException(reason, 
-                    "The server responsed with " + response.getResponse() + (message != null ? " \"" + message + "\"" : ""));
-        }
+	@Override
+	public final void onReceivedResponse(IWebPreferencesResponse response) {
+		if (response == null) {
+			throw new InvalidResponseException(null, "Error reading server response");
+		}
 
-        if (!this.getUUID().equals(response.getUUID()))
-        {
-            throw new InvalidResponseException(RequestFailureReason.UUID_MISMATCH, "The response UUID did not match the request");
-        }
+		if (response.getResponse().startsWith("500")) {
+			throw new InvalidResponseException(RequestFailureReason.SERVER_ERROR,
+				"The server returned an invalid resonse: " + response.getResponse(), response.getThrowable());
+		}
 
-        this.validateResponse(response);
-    }
-    
-    protected abstract void validateResponse(IWebPreferencesResponse response);
-    
-    protected final void validateKey(String key)
-    {
-        if (key == null || !WebPreferencesRequestAbstract.keyPattern.matcher(key).matches())
-        {
-            throw new InvalidRequestKeyException("The specified key [" + key + "] is not valid");
-        }
-    }
-    
-    protected final void validateValue(String key, String value)
-    {
-        if (value == null || value.length() > 255)
-        {
-            throw new InvalidRequestValueException("The specified value [" + value + "] for key [" + key + "] is not valid");
-        }
-    }
-    
-    public String toJson()
-    {
-        return WebPreferencesRequestAbstract.gson.toJson(this);
-    }
+		if (!response.getResponse().startsWith("200")) {
+			RequestFailureReason reason = RequestFailureReason.UNKNOWN;
 
-    @Override
-    public String toString()
-    {
-        try
-        {
-            return WebPreferencesRequestAbstract.gson.toJson(this);
-        }
-        catch (Throwable th)
-        {
-            return "{\"Invalid JSON\"}";
-        }
-    }
+			if (response.getResponse().startsWith("429")) reason = RequestFailureReason.THROTTLED;
+			if (response.getResponse().startsWith("401")) reason = RequestFailureReason.UNAUTHORISED;
+
+			String message = response.getMessage();
+			throw new InvalidResponseException(reason,
+				"The server responsed with " + response.getResponse() + (message != null ? " \"" + message + "\"" : ""));
+		}
+
+		if (!this.getUUID().equals(response.getUUID())) {
+			throw new InvalidResponseException(RequestFailureReason.UUID_MISMATCH, "The response UUID did not match the request");
+		}
+
+		this.validateResponse(response);
+	}
+
+	protected abstract void validateResponse(IWebPreferencesResponse response);
+
+	protected final void validateKey(String key) {
+		if (key == null || !WebPreferencesRequestAbstract.keyPattern.matcher(key).matches()) {
+			throw new InvalidRequestKeyException("The specified key [" + key + "] is not valid");
+		}
+	}
+
+	protected final void validateValue(String key, String value) {
+		if (value == null || value.length() > 255) {
+			throw new InvalidRequestValueException("The specified value [" + value + "] for key [" + key + "] is not valid");
+		}
+	}
+
+	public String toJson() {
+		return WebPreferencesRequestAbstract.gson.toJson(this);
+	}
+
+	@Override
+	public String toString() {
+		try {
+			return WebPreferencesRequestAbstract.gson.toJson(this);
+		} catch (Throwable th) {
+			return "{\"Invalid JSON\"}";
+		}
+	}
 }

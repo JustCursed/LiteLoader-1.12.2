@@ -11,11 +11,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.client.gui.GuiButton;
 
 @Mixin(GuiButton.class)
-public interface IGuiButton
-{
-    @Accessor("width")
-    public abstract int getButtonWidth();
-    
-    @Accessor("height")
-    public abstract int getButtonHeight();
+public interface IGuiButton {
+	@Accessor("width")
+	public abstract int getButtonWidth();
+
+	@Accessor("height")
+	public abstract int getButtonHeight();
 }

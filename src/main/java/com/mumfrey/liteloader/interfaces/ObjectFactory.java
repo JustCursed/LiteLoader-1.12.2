@@ -18,33 +18,31 @@ import net.minecraft.server.MinecraftServer;
 
 /**
  * Factory for generating loader managament objects based on the environment
- * 
- * @author Adam Mummery-Smith
  *
  * @param <TClient> Type of the client runtime, "Minecraft" on client and null
- *      on the server
+ *                  on the server
  * @param <TServer> Type of the server runtime, "IntegratedServer" on the client
- *      "MinecraftServer" on the server 
+ *                  "MinecraftServer" on the server
+ * @author Adam Mummery-Smith
  */
-public interface ObjectFactory<TClient, TServer extends MinecraftServer>
-{
-    public abstract LiteLoaderEventBroker<TClient, TServer> getEventBroker();
+public interface ObjectFactory<TClient, TServer extends MinecraftServer> {
+	public abstract LiteLoaderEventBroker<TClient, TServer> getEventBroker();
 
-    public abstract PacketEvents getPacketEventBroker();
+	public abstract PacketEvents getPacketEventBroker();
 
-    public abstract Input getInput();
+	public abstract Input getInput();
 
-    public abstract GameEngine<TClient, TServer> getGameEngine();
+	public abstract GameEngine<TClient, TServer> getGameEngine();
 
-    public abstract PanelManager<?> getPanelManager();
+	public abstract PanelManager<?> getPanelManager();
 
-    public abstract ClientPluginChannels getClientPluginChannels();
+	public abstract ClientPluginChannels getClientPluginChannels();
 
-    public abstract ServerPluginChannels getServerPluginChannels();
+	public abstract ServerPluginChannels getServerPluginChannels();
 
-    public abstract PermissionsManagerClient getClientPermissionManager();
+	public abstract PermissionsManagerClient getClientPermissionManager();
 
-    public abstract PermissionsManagerServer getServerPermissionManager();
+	public abstract PermissionsManagerServer getServerPermissionManager();
 
-    public abstract void preBeginGame();
+	public abstract void preBeginGame();
 }

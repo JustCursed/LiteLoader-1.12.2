@@ -15,13 +15,11 @@ import com.mumfrey.liteloader.core.LiteLoaderEventBroker;
 import net.minecraft.server.MinecraftServer;
 
 @Mixin(MinecraftServer.class)
-public abstract class MixinMinecraftServer
-{
-    LiteLoaderEventBroker<?, ?> broker = LiteLoaderEventBroker.getCommonBroker();
-    
-    @Inject(method = "updateTimeLightAndEntities()V", at = @At("HEAD"))
-    private void onServerTick(CallbackInfo ci)
-    {
-        this.broker.onServerTick((MinecraftServer)(Object)this);
-    }
+public abstract class MixinMinecraftServer {
+	LiteLoaderEventBroker<?, ?> broker = LiteLoaderEventBroker.getCommonBroker();
+
+	@Inject(method = "updateTimeLightAndEntities()V", at = @At("HEAD"))
+	private void onServerTick(CallbackInfo ci) {
+		this.broker.onServerTick((MinecraftServer) (Object) this);
+	}
 }

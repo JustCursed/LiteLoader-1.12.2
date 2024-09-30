@@ -12,12 +12,10 @@ package com.mumfrey.liteloader.core.exceptions;
  *
  * @author Adam Mummery-Smith
  */
-public class ProfilerCrossThreadAccessException extends RuntimeException
-{
-    private static final long serialVersionUID = 3225047722943528251L;
+public class ProfilerCrossThreadAccessException extends RuntimeException {
+	private static final long serialVersionUID = 3225047722943528251L;
 
-    public ProfilerCrossThreadAccessException(String message)
-    {
-        super("Calling thread name \"" + message + "\"");
-    }
+	public ProfilerCrossThreadAccessException(String message) {
+		super("Calling thread name \"" + message + "\"");
+	}
 }

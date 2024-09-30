@@ -9,7 +9,6 @@ import java.util.List;
 
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 
-public interface IReloadable
-{
-    public abstract List<IResourceManagerReloadListener> getReloadListeners();
+public interface IReloadable {
+	public abstract List<IResourceManagerReloadListener> getReloadListeners();
 }

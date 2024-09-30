@@ -10,81 +10,69 @@ import com.mumfrey.webprefs.exceptions.InvalidResponseException;
 import com.mumfrey.webprefs.interfaces.IWebPreferencesResponse;
 import com.mumfrey.webprefs.interfaces.IWebPreferencesServiceDelegate;
 
-class WebPreferencesRequestGet extends WebPreferencesRequestAbstract
-{
-    private static final long serialVersionUID = 1L;
+class WebPreferencesRequestGet extends WebPreferencesRequestAbstract {
+	private static final long serialVersionUID = 1L;
 
-    @Expose @SerializedName("get")
-    private final Set<String> keys = new HashSet<String>();
-    
-    @Expose @SerializedName("private")
-    private boolean isPrivate;
+	@Expose
+	@SerializedName("get")
+	private final Set<String> keys = new HashSet<String>();
 
-    public WebPreferencesRequestGet(IWebPreferencesServiceDelegate delegate, String uuid, Set<String> keys)
-    {
-        this(delegate, uuid, keys, false);
-    }
+	@Expose
+	@SerializedName("private")
+	private boolean isPrivate;
 
-    public WebPreferencesRequestGet(IWebPreferencesServiceDelegate delegate, String uuid, Set<String> keys, boolean isPrivate)
-    {
-        super(delegate, uuid);
+	public WebPreferencesRequestGet(IWebPreferencesServiceDelegate delegate, String uuid, Set<String> keys) {
+		this(delegate, uuid, keys, false);
+	}
 
-        if (isPrivate && delegate.getSession() == null)
-        {
-            throw new InvalidRequestException(RequestFailureReason.NO_SESSION, "Cannot request private values without supplying a session");
-        }
+	public WebPreferencesRequestGet(IWebPreferencesServiceDelegate delegate, String uuid, Set<String> keys, boolean isPrivate) {
+		super(delegate, uuid);
 
-        this.validate(keys);
+		if (isPrivate && delegate.getSession() == null) {
+			throw new InvalidRequestException(RequestFailureReason.NO_SESSION, "Cannot request private values without supplying a session");
+		}
 
-        this.keys.addAll(keys);
-        this.isPrivate = isPrivate;
-    }
+		this.validate(keys);
 
-    @Override
-    protected String getPath()
-    {
-        return "/get";
-    }
+		this.keys.addAll(keys);
+		this.isPrivate = isPrivate;
+	}
 
-    @Override
-    public boolean isValidationRequired()
-    {
-        return this.isPrivate;
-    }
+	@Override
+	protected String getPath() {
+		return "/get";
+	}
 
-    @Override
-    public Set<String> getKeys()
-    {
-        return this.keys;
-    }
+	@Override
+	public boolean isValidationRequired() {
+		return this.isPrivate;
+	}
 
-    @Override
-    protected void validateResponse(IWebPreferencesResponse response)
-    {
-        if (response.hasValues())
-        {
-            Set<String> responseKeys = response.getValues().keySet();
-            for (String key : this.keys)
-            {
-                if (!responseKeys.contains(key))
-                {
-                    throw new InvalidResponseException(RequestFailureReason.BAD_DATA,
-                            "The server responded with an incomplete key set, missing key [" + key + "]");
-                }
-            }
-        }
-    }
-    
-    private void validate(Set<String> keys)
-    {
-        if (keys == null || keys.isEmpty())
-        {
-            throw new InvalidRequestException(RequestFailureReason.BAD_PARAMS, "Cannot request an empty set");
-        }
+	@Override
+	public Set<String> getKeys() {
+		return this.keys;
+	}
 
-        for (String key : keys)
-        {
-            this.validateKey(key);
-        }
-    }
+	@Override
+	protected void validateResponse(IWebPreferencesResponse response) {
+		if (response.hasValues()) {
+			Set<String> responseKeys = response.getValues().keySet();
+			for (String key : this.keys) {
+				if (!responseKeys.contains(key)) {
+					throw new InvalidResponseException(RequestFailureReason.BAD_DATA,
+						"The server responded with an incomplete key set, missing key [" + key + "]");
+				}
+			}
+		}
+	}
+
+	private void validate(Set<String> keys) {
+		if (keys == null || keys.isEmpty()) {
+			throw new InvalidRequestException(RequestFailureReason.BAD_PARAMS, "Cannot request an empty set");
+		}
+
+		for (String key : keys) {
+			this.validateKey(key);
+		}
+	}
 }

@@ -10,13 +10,12 @@ package com.mumfrey.liteloader;
  *
  * @author Adam Mummery-Smith
  */
-public interface OutboundChatFilter extends LiteMod
-{
-    /**
-     * Raised when a chat message is being sent, return false to filter this
-     * message or true to allow it to be sent.
-     * 
-     * @param message
-     */
-    public abstract boolean onSendChatMessage(String message); 
+public interface OutboundChatFilter extends LiteMod {
+	/**
+	 * Raised when a chat message is being sent, return false to filter this
+	 * message or true to allow it to be sent.
+	 *
+	 * @param message
+	 */
+	public abstract boolean onSendChatMessage(String message);
 }

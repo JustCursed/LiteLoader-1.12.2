@@ -11,41 +11,36 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.launchwrapper.IClassTransformer;
 import top.outlands.foundation.TransformerDelegate;
 
-public class CrashSectionLaunchWrapper
-{
-    final CrashReport crashReport;
+public class CrashSectionLaunchWrapper {
+	final CrashReport crashReport;
 
-    public CrashSectionLaunchWrapper(CrashReport report)
-    {
-        this.crashReport = report;
-    }
+	public CrashSectionLaunchWrapper(CrashReport report) {
+		this.crashReport = report;
+	}
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return CrashSectionLaunchWrapper.generateTransformerList();
-    }
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return CrashSectionLaunchWrapper.generateTransformerList();
+	}
 
-    /**
-     * Generates a list of active transformers to display in the crash report
-     */
-    public static String generateTransformerList()
-    {
-        final List<IClassTransformer> transformers = TransformerDelegate.getTransformers();
+	/**
+	 * Generates a list of active transformers to display in the crash report
+	 */
+	public static String generateTransformerList() {
+		final List<IClassTransformer> transformers = TransformerDelegate.getTransformers();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(transformers.size());
-        sb.append(" active transformer(s)");
+		StringBuilder sb = new StringBuilder();
+		sb.append(transformers.size());
+		sb.append(" active transformer(s)");
 
-        for (IClassTransformer transformer : transformers)
-        {
-            sb.append("\n          - Transformer: ");
-            sb.append(transformer.getClass().getName());
-        }
+		for (IClassTransformer transformer : transformers) {
+			sb.append("\n          - Transformer: ");
+			sb.append(transformer.getClass().getName());
+		}
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 }

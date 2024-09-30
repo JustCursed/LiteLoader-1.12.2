@@ -13,23 +13,19 @@ import net.minecraft.network.Packet;
  *
  * @author Adam Mummery-Smith
  */
-public class PacketHandlerException extends RuntimeException
-{
-    private static final long serialVersionUID = -330946238844640302L;
+public class PacketHandlerException extends RuntimeException {
+	private static final long serialVersionUID = -330946238844640302L;
 
-    private Packet<?> packet;
+	private Packet<?> packet;
 
-    public PacketHandlerException(Packet<?> packet)
-    {
-    }
+	public PacketHandlerException(Packet<?> packet) {
+	}
 
-    public PacketHandlerException(Packet<?> packet, String message)
-    {
-        super(message);
-    }
+	public PacketHandlerException(Packet<?> packet, String message) {
+		super(message);
+	}
 
-    public Packet<?> getPacket()
-    {
-        return this.packet;
-    }
+	public Packet<?> getPacket() {
+		return this.packet;
+	}
 }

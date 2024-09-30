@@ -12,18 +12,15 @@ import com.mumfrey.liteloader.transformers.event.InjectionPoint;
 import com.mumfrey.liteloader.transformers.event.MethodInfo;
 import com.mumfrey.liteloader.transformers.event.inject.MethodHead;
 
-public class LiteLoaderPacketTransformer extends EventInjectionTransformer
-{
-    @Override
-    protected void addEvents()
-    {
-        InjectionPoint methodHead = new MethodHead();
-        MethodInfo handlePacket = new MethodInfo(Obf.PacketEvents, "handlePacket");
+public class LiteLoaderPacketTransformer extends EventInjectionTransformer {
+	@Override
+	protected void addEvents() {
+		InjectionPoint methodHead = new MethodHead();
+		MethodInfo handlePacket = new MethodInfo(Obf.PacketEvents, "handlePacket");
 
-        for (Packets packet : Packets.packets)
-        {
-            MethodInfo processPacket = new MethodInfo(packet, Obf.processPacket, Void.TYPE, Obf.INetHandler);
-            this.addEvent(new PacketEvent(packet), processPacket, methodHead).addListener(handlePacket);
-        }
-    }
+		for (Packets packet : Packets.packets) {
+			MethodInfo processPacket = new MethodInfo(packet, Obf.processPacket, Void.TYPE, Obf.INetHandler);
+			this.addEvent(new PacketEvent(packet), processPacket, methodHead).addListener(handlePacket);
+		}
+	}
 }

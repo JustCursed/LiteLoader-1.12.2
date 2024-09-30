@@ -11,12 +11,10 @@ package com.mumfrey.liteloader.core.exceptions;
  *
  * @author Adam Mummery-Smith
  */
-public class ProfilerStackCorruptionException extends RuntimeException
-{
-    private static final long serialVersionUID = -7745831270297368169L;
+public class ProfilerStackCorruptionException extends RuntimeException {
+	private static final long serialVersionUID = -7745831270297368169L;
 
-    public ProfilerStackCorruptionException(String message)
-    {
-        super(message);
-    }
+	public ProfilerStackCorruptionException(String message) {
+		super(message);
+	}
 }

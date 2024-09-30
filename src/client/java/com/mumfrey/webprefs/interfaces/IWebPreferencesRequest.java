@@ -5,19 +5,18 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-public interface IWebPreferencesRequest extends Serializable
-{
-    public abstract IWebPreferencesServiceDelegate getDelegate();
-    
-    public abstract boolean isValidationRequired();
-    
-    public abstract URI getRequestURI();
+public interface IWebPreferencesRequest extends Serializable {
+	public abstract IWebPreferencesServiceDelegate getDelegate();
 
-    public abstract String getUUID();
+	public abstract boolean isValidationRequired();
 
-    public abstract Set<String> getKeys();
-    
-    public abstract Map<String, String> getPostVars();
+	public abstract URI getRequestURI();
 
-    public abstract void onReceivedResponse(IWebPreferencesResponse response);
+	public abstract String getUUID();
+
+	public abstract Set<String> getKeys();
+
+	public abstract Map<String, String> getPostVars();
+
+	public abstract void onReceivedResponse(IWebPreferencesResponse response);
 }

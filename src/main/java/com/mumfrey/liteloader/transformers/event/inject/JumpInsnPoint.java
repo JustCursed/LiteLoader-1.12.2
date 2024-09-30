@@ -21,54 +21,46 @@ import com.mumfrey.liteloader.transformers.event.InjectionPoint;
  * particular ordinal in the method body (eg. "the Nth JUMP insn" where N is the
  * ordinal of the instruction). By default it returns all JUMP instructions in a
  * method body.
- * 
+ *
  * @author Adam Mummery-Smith
  */
-public class JumpInsnPoint extends InjectionPoint
-{
-    private final int opCode;
+public class JumpInsnPoint extends InjectionPoint {
+	private final int opCode;
 
-    private final int ordinal;
+	private final int ordinal;
 
-    public JumpInsnPoint()
-    {
-        this(0, -1);
-    }
+	public JumpInsnPoint() {
+		this(0, -1);
+	}
 
-    public JumpInsnPoint(int ordinal)
-    {
-        this(0, ordinal);
-    }
+	public JumpInsnPoint(int ordinal) {
+		this(0, ordinal);
+	}
 
-    public JumpInsnPoint(int opCode, int ordinal)
-    {
-        this.opCode = opCode;
-        this.ordinal = ordinal;
-    }
+	public JumpInsnPoint(int opCode, int ordinal) {
+		this.opCode = opCode;
+		this.ordinal = ordinal;
+	}
 
-    @Override
-    public boolean find(String desc, InsnList insns, Collection<AbstractInsnNode> nodes, Event event)
-    {
-        boolean found = false;
-        int ordinal = 0;
+	@Override
+	public boolean find(String desc, InsnList insns, Collection<AbstractInsnNode> nodes, Event event) {
+		boolean found = false;
+		int ordinal = 0;
 
-        ListIterator<AbstractInsnNode> iter = insns.iterator();
-        while (iter.hasNext())
-        {
-            AbstractInsnNode insn = iter.next();
+		ListIterator<AbstractInsnNode> iter = insns.iterator();
+		while (iter.hasNext()) {
+			AbstractInsnNode insn = iter.next();
 
-            if (insn instanceof JumpInsnNode && (this.opCode == -1 || insn.getOpcode() == this.opCode))
-            {
-                if (this.ordinal == -1 || this.ordinal == ordinal)
-                {
-                    nodes.add(insn);
-                    found = true;
-                }
+			if (insn instanceof JumpInsnNode && (this.opCode == -1 || insn.getOpcode() == this.opCode)) {
+				if (this.ordinal == -1 || this.ordinal == ordinal) {
+					nodes.add(insn);
+					found = true;
+				}
 
-                ordinal++;
-            }
-        }
+				ordinal++;
+			}
+		}
 
-        return found;
-    }
+		return found;
+	}
 }

@@ -21,31 +21,29 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 
 @Mixin(RenderManager.class)
-public abstract class MixinRenderManager implements IRenderManager
-{
-    @Shadow @Final private Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap;
-    
-    private LiteLoaderEventBrokerClient broker;
-    
-    @Override
-    public Map<Class<? extends Entity>, Render<? extends Entity>> getRenderMap()
-    {
-        return this.entityRenderMap;
-    }
-    
-    @Redirect(method = "renderEntity(Lnet/minecraft/entity/Entity;DDDFFZ)V", at = @At(
-        value = "INVOKE",
-        target = "Lnet/minecraft/client/renderer/entity/Render;doRender(Lnet/minecraft/entity/Entity;DDDFF)V"
-    ))
-    private <T extends Entity> void onRenderEntity(Render<T> render, T entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
-        if (this.broker == null)
-        {
-            this.broker = LiteLoaderEventBrokerClient.getInstance();
-        }
+public abstract class MixinRenderManager implements IRenderManager {
+	@Shadow
+	@Final
+	private Map<Class<? extends Entity>, Render<? extends Entity>> entityRenderMap;
 
-        this.broker.onRenderEntity((RenderManager)(Object)this, entity, x, y, z, entityYaw, partialTicks, render);
-        render.doRender(entity, x, y, z, entityYaw, partialTicks);
-        this.broker.onPostRenderEntity((RenderManager)(Object)this, entity, x, y, z, entityYaw, partialTicks, render);
-    }
+	private LiteLoaderEventBrokerClient broker;
+
+	@Override
+	public Map<Class<? extends Entity>, Render<? extends Entity>> getRenderMap() {
+		return this.entityRenderMap;
+	}
+
+	@Redirect(method = "renderEntity(Lnet/minecraft/entity/Entity;DDDFFZ)V", at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/client/renderer/entity/Render;doRender(Lnet/minecraft/entity/Entity;DDDFF)V"
+	))
+	private <T extends Entity> void onRenderEntity(Render<T> render, T entity, double x, double y, double z, float entityYaw, float partialTicks) {
+		if (this.broker == null) {
+			this.broker = LiteLoaderEventBrokerClient.getInstance();
+		}
+
+		this.broker.onRenderEntity((RenderManager) (Object) this, entity, x, y, z, entityYaw, partialTicks, render);
+		render.doRender(entity, x, y, z, entityYaw, partialTicks);
+		this.broker.onPostRenderEntity((RenderManager) (Object) this, entity, x, y, z, entityYaw, partialTicks, render);
+	}
 }

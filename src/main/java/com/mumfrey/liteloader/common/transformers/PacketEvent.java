@@ -23,75 +23,70 @@ import com.mumfrey.liteloader.transformers.event.EventInfo;
 
 /**
  * Special event used to hook all packets
- * 
+ *
  * @author Adam Mummery-Smith
  */
-public class PacketEvent extends Event
-{
-    private static Set<String> names = new HashSet<String>();
-    
-    /**
-     * Soft index for this packet, used as a lookup for speed when determining
-     * handlers.
-     */
-    private int packetIndex;
+public class PacketEvent extends Event {
+	private static Set<String> names = new HashSet<String>();
 
-    PacketEvent(Packets packet)
-    {
-        super(PacketEvent.getPacketEventName(packet), true, 1000);
-        this.packetIndex = packet.getIndex();
-        this.verbose = false;
-    }
+	/**
+	 * Soft index for this packet, used as a lookup for speed when determining
+	 * handlers.
+	 */
+	private int packetIndex;
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.transformers.event.Event
-     *      #getEventInfoClassName()
-     */
-    @Override
-    public String getEventInfoClassName()
-    {
-        return "com/mumfrey/liteloader/common/transformers/PacketEventInfo";
-    }
+	PacketEvent(Packets packet) {
+		super(PacketEvent.getPacketEventName(packet), true, 1000);
+		this.packetIndex = packet.getIndex();
+		this.verbose = false;
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.transformers.event.Event
-     *      #invokeEventInfoConstructor(org.objectweb.asm.tree.InsnList,
-     *      boolean)
-     */
-    @Override
-    protected int invokeEventInfoConstructor(InsnList insns, boolean cancellable, boolean pushReturnValue, int marshallVar)
-    {
-        int ctorMAXS = 0;
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.transformers.event.Event
+	 *      #getEventInfoClassName()
+	 */
+	@Override
+	public String getEventInfoClassName() {
+		return "com/mumfrey/liteloader/common/transformers/PacketEventInfo";
+	}
 
-        insns.add(new LdcInsnNode(this.name)); ctorMAXS++;
-        insns.add(this.methodIsStatic ? new InsnNode(Opcodes.ACONST_NULL) : new VarInsnNode(Opcodes.ALOAD, 0)); ctorMAXS++;
-        insns.add(new InsnNode(cancellable ? Opcodes.ICONST_1 : Opcodes.ICONST_0)); ctorMAXS++;
-        insns.add(new IntInsnNode(Opcodes.BIPUSH, this.packetIndex));
-        insns.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, this.eventInfoClass, Obf.constructor.name,
-                EventInfo.getConstructorDescriptor().replace(")", "I)"), false));
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.transformers.event.Event
+	 *      #invokeEventInfoConstructor(org.objectweb.asm.tree.InsnList,
+	 *      boolean)
+	 */
+	@Override
+	protected int invokeEventInfoConstructor(InsnList insns, boolean cancellable, boolean pushReturnValue, int marshallVar) {
+		int ctorMAXS = 0;
 
-        return ctorMAXS;
-    }
+		insns.add(new LdcInsnNode(this.name));
+		ctorMAXS++;
+		insns.add(this.methodIsStatic ? new InsnNode(Opcodes.ACONST_NULL) : new VarInsnNode(Opcodes.ALOAD, 0));
+		ctorMAXS++;
+		insns.add(new InsnNode(cancellable ? Opcodes.ICONST_1 : Opcodes.ICONST_0));
+		ctorMAXS++;
+		insns.add(new IntInsnNode(Opcodes.BIPUSH, this.packetIndex));
+		insns.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, this.eventInfoClass, Obf.constructor.name,
+			EventInfo.getConstructorDescriptor().replace(")", "I)"), false));
 
-    private static String getPacketEventName(Packets packet)
-    {
-        String baseName = "on" + packet.getShortName();
-        if (!PacketEvent.names.contains(baseName))
-        {
-            PacketEvent.names.add(baseName);
-            return baseName;
-        }
-        
-        for (int ordinal = 1; ordinal < 33; ordinal++)
-        {
-            String offsetName = String.format("%s#%d", baseName, ordinal);
-            if (!PacketEvent.names.contains(offsetName))
-            {
-                PacketEvent.names.add(offsetName);
-                return offsetName;
-            }
-        }
-        
-        throw new IllegalArgumentException("Too many packet events with the same name: " + baseName);
-    }
+		return ctorMAXS;
+	}
+
+	private static String getPacketEventName(Packets packet) {
+		String baseName = "on" + packet.getShortName();
+		if (!PacketEvent.names.contains(baseName)) {
+			PacketEvent.names.add(baseName);
+			return baseName;
+		}
+
+		for (int ordinal = 1; ordinal < 33; ordinal++) {
+			String offsetName = String.format("%s#%d", baseName, ordinal);
+			if (!PacketEvent.names.contains(offsetName)) {
+				PacketEvent.names.add(offsetName);
+				return offsetName;
+			}
+		}
+
+		throw new IllegalArgumentException("Too many packet events with the same name: " + baseName);
+	}
 }

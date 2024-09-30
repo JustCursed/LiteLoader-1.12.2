@@ -5,13 +5,11 @@
  */
 package com.mumfrey.liteloader.transformers.access;
 
-public class AccessorException extends RuntimeException
-{
-    private static final long serialVersionUID = 1L;
+public class AccessorException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    public AccessorException(String message)
-    {
-        super(message);
-    }
-    
+	public AccessorException(String message) {
+		super(message);
+	}
+
 }

@@ -29,110 +29,97 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldServer;
 
 @Mixin(NetHandlerPlayServer.class)
-public abstract class MixinNetHandlerPlayServer implements ITeleportHandler
-{
-    @Shadow private int teleportId;
-    @Shadow private Vec3d targetPos;
-    @Shadow public EntityPlayerMP player;
-    
-    LiteLoaderEventBroker<?, ?> broker = LiteLoaderEventBroker.getCommonBroker();
-    
-    @Inject(
-        method = "processTryUseItem(Lnet/minecraft/network/play/client/CPacketPlayerTryUseItem;)V",
-        cancellable = true,
-        at = @At(
-            value = "INVOKE",
-            shift = Shift.AFTER,
-            target = "Lnet/minecraft/network/PacketThreadUtil;checkThreadAndEnqueue"
-                    + "(Lnet/minecraft/network/Packet;Lnet/minecraft/network/INetHandler;Lnet/minecraft/util/IThreadListener;)V"
-        )
-    )
-    private void onPlaceBlock(CPacketPlayerTryUseItem packetIn, CallbackInfo ci)
-    {
-//        this.onPlaceBlock(ci, (NetHandlerPlayServer)(Object)this, packetIn);
-    }
-    
-    @Inject(
-        method = "handleAnimation(Lnet/minecraft/network/play/client/CPacketAnimation;)V",
-        cancellable = true,
-        at = @At(
-            value = "INVOKE",
-            shift = Shift.AFTER,
-            target = "Lnet/minecraft/network/PacketThreadUtil;checkThreadAndEnqueue"
-                    + "(Lnet/minecraft/network/Packet;Lnet/minecraft/network/INetHandler;Lnet/minecraft/util/IThreadListener;)V"
-        )
-    )
-    private void onClickedAir(CPacketAnimation packetIn, CallbackInfo ci)
-    {
-        if (!this.broker.onClickedAir(InteractType.LEFT_CLICK, ((NetHandlerPlayServer)(Object)this).player, packetIn.getHand()))
-        {
-            ci.cancel();
-        }
-    }
-    
-    @Inject(
-        method = "processPlayerDigging(Lnet/minecraft/network/play/client/CPacketPlayerDigging;)V",
-        cancellable = true,
-        at = @At(
-            value = "INVOKE",
-            shift = Shift.AFTER,
-            target = "Lnet/minecraft/network/PacketThreadUtil;checkThreadAndEnqueue"
-                    + "(Lnet/minecraft/network/Packet;Lnet/minecraft/network/INetHandler;Lnet/minecraft/util/IThreadListener;)V"
-        )
-    )
-    private void onPlayerDigging(CPacketPlayerDigging packetIn, CallbackInfo ci)
-    {
-        NetHandlerPlayServer netHandler = (NetHandlerPlayServer)(Object)this;
-        Action action = packetIn.getAction();
-        if (action == Action.START_DESTROY_BLOCK)
-        {
-            if (!this.broker.onPlayerDigging(InteractType.DIG_BLOCK_MAYBE, this.player, netHandler, packetIn.getPosition()))
-            {
-                ci.cancel();
-            }
-        }
-        else if (action == Action.ABORT_DESTROY_BLOCK || action == Action.STOP_DESTROY_BLOCK)
-        {
-            this.broker.onPlayerDigging(InteractType.DIG_BLOCK_END, this.player, netHandler, packetIn.getPosition());
-        }
-        else if (action == Action.SWAP_HELD_ITEMS)
-        {
-            if (!this.broker.onPlayerSwapItems(this.player))
-            {
-                ci.cancel();
-            }
-        }
-    }
-    
-    @Inject(
-        method = "processPlayer(Lnet/minecraft/network/play/client/CPacketPlayer;)V",
-        cancellable = true,
-        locals = LocalCapture.CAPTURE_FAILHARD,
-        at = @At(
-            value = "FIELD",
-            opcode = Opcodes.GETFIELD,
-            target = "Lnet/minecraft/entity/player/EntityPlayerMP;posY:D",
-            ordinal = 3
-        )
-    )
-    private void onPlayerMoved(CPacketPlayer packetIn, CallbackInfo ci, WorldServer world)
-    {
-        if (!this.broker.onPlayerMove((NetHandlerPlayServer)(Object)this, packetIn, this.player, world))
-        {
-            ci.cancel();
-        }
-    }
-    
-    @Override
-    public int beginTeleport(Vec3d location)
-    {
-        this.targetPos = location;
+public abstract class MixinNetHandlerPlayServer implements ITeleportHandler {
+	@Shadow
+	private int teleportId;
+	@Shadow
+	private Vec3d targetPos;
+	@Shadow
+	public EntityPlayerMP player;
 
-        if (++this.teleportId == Integer.MAX_VALUE)
-        {
-            this.teleportId = 0;
-        }
-        
-        return this.teleportId;
-    }
+	LiteLoaderEventBroker<?, ?> broker = LiteLoaderEventBroker.getCommonBroker();
+
+	@Inject(
+		method = "processTryUseItem(Lnet/minecraft/network/play/client/CPacketPlayerTryUseItem;)V",
+		cancellable = true,
+		at = @At(
+			value = "INVOKE",
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/network/PacketThreadUtil;checkThreadAndEnqueue"
+				+ "(Lnet/minecraft/network/Packet;Lnet/minecraft/network/INetHandler;Lnet/minecraft/util/IThreadListener;)V"
+		)
+	)
+	private void onPlaceBlock(CPacketPlayerTryUseItem packetIn, CallbackInfo ci) {
+//        this.onPlaceBlock(ci, (NetHandlerPlayServer)(Object)this, packetIn);
+	}
+
+	@Inject(
+		method = "handleAnimation(Lnet/minecraft/network/play/client/CPacketAnimation;)V",
+		cancellable = true,
+		at = @At(
+			value = "INVOKE",
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/network/PacketThreadUtil;checkThreadAndEnqueue"
+				+ "(Lnet/minecraft/network/Packet;Lnet/minecraft/network/INetHandler;Lnet/minecraft/util/IThreadListener;)V"
+		)
+	)
+	private void onClickedAir(CPacketAnimation packetIn, CallbackInfo ci) {
+		if (!this.broker.onClickedAir(InteractType.LEFT_CLICK, ((NetHandlerPlayServer) (Object) this).player, packetIn.getHand())) {
+			ci.cancel();
+		}
+	}
+
+	@Inject(
+		method = "processPlayerDigging(Lnet/minecraft/network/play/client/CPacketPlayerDigging;)V",
+		cancellable = true,
+		at = @At(
+			value = "INVOKE",
+			shift = Shift.AFTER,
+			target = "Lnet/minecraft/network/PacketThreadUtil;checkThreadAndEnqueue"
+				+ "(Lnet/minecraft/network/Packet;Lnet/minecraft/network/INetHandler;Lnet/minecraft/util/IThreadListener;)V"
+		)
+	)
+	private void onPlayerDigging(CPacketPlayerDigging packetIn, CallbackInfo ci) {
+		NetHandlerPlayServer netHandler = (NetHandlerPlayServer) (Object) this;
+		Action action = packetIn.getAction();
+		if (action == Action.START_DESTROY_BLOCK) {
+			if (!this.broker.onPlayerDigging(InteractType.DIG_BLOCK_MAYBE, this.player, netHandler, packetIn.getPosition())) {
+				ci.cancel();
+			}
+		} else if (action == Action.ABORT_DESTROY_BLOCK || action == Action.STOP_DESTROY_BLOCK) {
+			this.broker.onPlayerDigging(InteractType.DIG_BLOCK_END, this.player, netHandler, packetIn.getPosition());
+		} else if (action == Action.SWAP_HELD_ITEMS) {
+			if (!this.broker.onPlayerSwapItems(this.player)) {
+				ci.cancel();
+			}
+		}
+	}
+
+	@Inject(
+		method = "processPlayer(Lnet/minecraft/network/play/client/CPacketPlayer;)V",
+		cancellable = true,
+		locals = LocalCapture.CAPTURE_FAILHARD,
+		at = @At(
+			value = "FIELD",
+			opcode = Opcodes.GETFIELD,
+			target = "Lnet/minecraft/entity/player/EntityPlayerMP;posY:D",
+			ordinal = 3
+		)
+	)
+	private void onPlayerMoved(CPacketPlayer packetIn, CallbackInfo ci, WorldServer world) {
+		if (!this.broker.onPlayerMove((NetHandlerPlayServer) (Object) this, packetIn, this.player, world)) {
+			ci.cancel();
+		}
+	}
+
+	@Override
+	public int beginTeleport(Vec3d location) {
+		this.targetPos = location;
+
+		if (++this.teleportId == Integer.MAX_VALUE) {
+			this.teleportId = 0;
+		}
+
+		return this.teleportId;
+	}
 }

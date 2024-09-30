@@ -17,13 +17,13 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 
 @Mixin(SimpleReloadableResourceManager.class)
-public abstract class MixinSimpleReloadableResourceManager implements IReloadable
-{
-    @Shadow @Final private List<IResourceManagerReloadListener> reloadListeners;
-    
-    @Override
-    public List<IResourceManagerReloadListener> getReloadListeners()
-    {
-        return this.reloadListeners;
-    }
+public abstract class MixinSimpleReloadableResourceManager implements IReloadable {
+	@Shadow
+	@Final
+	private List<IResourceManagerReloadListener> reloadListeners;
+
+	@Override
+	public List<IResourceManagerReloadListener> getReloadListeners() {
+		return this.reloadListeners;
+	}
 }

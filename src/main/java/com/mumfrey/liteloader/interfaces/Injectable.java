@@ -17,29 +17,29 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
  *
  * @author Adam Mummery-Smith
  */
-public interface Injectable
-{
-    /**
-     * Get the URL of this injectable resource
-     * @throws MalformedURLException
-     */
-    public abstract URL getURL() throws MalformedURLException;
+public interface Injectable {
+	/**
+	 * Get the URL of this injectable resource
+	 *
+	 * @throws MalformedURLException
+	 */
+	public abstract URL getURL() throws MalformedURLException;
 
-    /**
-     * Returns true if this object has been injected already
-     */
-    public abstract boolean isInjected();
+	/**
+	 * Returns true if this object has been injected already
+	 */
+	public abstract boolean isInjected();
 
-    /**
-     * @param classLoader
-     * @param injectIntoParent
-     * @return whether the injection was successful or not
-     * @throws MalformedURLException
-     */
-    public abstract boolean injectIntoClassPath(LaunchClassLoader classLoader, boolean injectIntoParent) throws MalformedURLException;
+	/**
+	 * @param classLoader
+	 * @param injectIntoParent
+	 * @return whether the injection was successful or not
+	 * @throws MalformedURLException
+	 */
+	public abstract boolean injectIntoClassPath(LaunchClassLoader classLoader, boolean injectIntoParent) throws MalformedURLException;
 
-    /**
-     * Get the injection strategy for this object
-     */
-    public abstract InjectionStrategy getInjectionStrategy();
+	/**
+	 * Get the injection strategy for this object
+	 */
+	public abstract InjectionStrategy getInjectionStrategy();
 }

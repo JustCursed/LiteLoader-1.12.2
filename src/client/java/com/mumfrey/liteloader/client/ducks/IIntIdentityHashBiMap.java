@@ -5,7 +5,6 @@
  */
 package com.mumfrey.liteloader.client.ducks;
 
-public interface IIntIdentityHashBiMap<V>
-{
-    public abstract void removeObject(V object);
+public interface IIntIdentityHashBiMap<V> {
+	public abstract void removeObject(V object);
 }

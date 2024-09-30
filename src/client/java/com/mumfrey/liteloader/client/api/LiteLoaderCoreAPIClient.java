@@ -30,140 +30,129 @@ import net.minecraft.server.integrated.IntegratedServer;
  *
  * @author Adam Mummery-Smith
  */
-public class LiteLoaderCoreAPIClient extends LiteLoaderCoreAPI
-{
-    private static final String PKG_LITELOADER_CLIENT = LiteLoaderCoreAPI.PKG_LITELOADER + ".client";
+public class LiteLoaderCoreAPIClient extends LiteLoaderCoreAPI {
+	private static final String PKG_LITELOADER_CLIENT = LiteLoaderCoreAPI.PKG_LITELOADER + ".client";
 
-    private static final String[] requiredTransformers = {
-            LiteLoaderCoreAPI.PKG_LITELOADER + ".transformers.event.EventProxyTransformer",
-            LiteLoaderCoreAPI.PKG_LITELOADER + ".launch.LiteLoaderTransformer",
-            LiteLoaderCoreAPIClient.PKG_LITELOADER_CLIENT + ".transformers.CrashReportTransformer"
-    };
+	private static final String[] requiredTransformers = {
+		LiteLoaderCoreAPI.PKG_LITELOADER + ".transformers.event.EventProxyTransformer",
+		LiteLoaderCoreAPI.PKG_LITELOADER + ".launch.LiteLoaderTransformer",
+		LiteLoaderCoreAPIClient.PKG_LITELOADER_CLIENT + ".transformers.CrashReportTransformer"
+	};
 
-    private static final String[] requiredDownstreamTransformers = {
-            LiteLoaderCoreAPI.PKG_LITELOADER_COMMON + ".transformers.LiteLoaderPacketTransformer",
-            LiteLoaderCoreAPI.PKG_LITELOADER + ".transformers.event.json.ModEventInjectionTransformer"
-    };
+	private static final String[] requiredDownstreamTransformers = {
+		LiteLoaderCoreAPI.PKG_LITELOADER_COMMON + ".transformers.LiteLoaderPacketTransformer",
+		LiteLoaderCoreAPI.PKG_LITELOADER + ".transformers.event.json.ModEventInjectionTransformer"
+	};
 
-    private static final String[] clientMixinConfigs = new String[] {
-            "mixins.liteloader.client.json",
-            "mixins.liteloader.client.preinit.json",
-            "mixins.liteloader.client.optional.json",
-    };
+	private static final String[] clientMixinConfigs = new String[]{
+		"mixins.liteloader.client.json",
+		"mixins.liteloader.client.preinit.json",
+		"mixins.liteloader.client.optional.json",
+	};
 
-    private ObjectFactory<Minecraft, IntegratedServer> objectFactory;
-    
-    @Override
-    public String[] getMixinConfigs()
-    {
-        String[] commonConfigs = super.getMixinConfigs();
-        return ObjectArrays.concat(commonConfigs, LiteLoaderCoreAPIClient.clientMixinConfigs, String.class);
-    }
+	private ObjectFactory<Minecraft, IntegratedServer> objectFactory;
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.api.LiteAPI#getRequiredTransformers()
-     */
-    @Override
-    public String[] getRequiredTransformers()
-    {
-        return LiteLoaderCoreAPIClient.requiredTransformers;
-    }
+	@Override
+	public String[] getMixinConfigs() {
+		String[] commonConfigs = super.getMixinConfigs();
+		return ObjectArrays.concat(commonConfigs, LiteLoaderCoreAPIClient.clientMixinConfigs, String.class);
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.api.LiteAPI
-     *      #getRequiredDownstreamTransformers()
-     */
-    @Override
-    public String[] getRequiredDownstreamTransformers()
-    {
-        return LiteLoaderCoreAPIClient.requiredDownstreamTransformers;
-    }
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.api.LiteAPI#getRequiredTransformers()
+	 */
+	@Override
+	public String[] getRequiredTransformers() {
+		return LiteLoaderCoreAPIClient.requiredTransformers;
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.api.LiteAPI#getCustomisationProviders()
-     */
-    @Override
-    public List<CustomisationProvider> getCustomisationProviders()
-    {
-        return ImmutableList.<CustomisationProvider>of
-        (
-            new LiteLoaderBrandingProvider(),
-            new LiteLoaderModInfoDecorator(),
-            new Translator()
-        );
-    }
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.api.LiteAPI
+	 *      #getRequiredDownstreamTransformers()
+	 */
+	@Override
+	public String[] getRequiredDownstreamTransformers() {
+		return LiteLoaderCoreAPIClient.requiredDownstreamTransformers;
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.api.LiteAPI#getCoreProviders()
-     */
-    @Override
-    public List<CoreProvider> getCoreProviders()
-    {
-        return ImmutableList.<CoreProvider>of
-        (
-            new LiteLoaderCoreProviderClient(this.properties),
-            LiteLoader.getInput()
-        );
-    }
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.api.LiteAPI#getCustomisationProviders()
+	 */
+	@Override
+	public List<CustomisationProvider> getCustomisationProviders() {
+		return ImmutableList.<CustomisationProvider>of
+			(
+				new LiteLoaderBrandingProvider(),
+				new LiteLoaderModInfoDecorator(),
+				new Translator()
+			);
+	}
+
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.api.LiteAPI#getCoreProviders()
+	 */
+	@Override
+	public List<CoreProvider> getCoreProviders() {
+		return ImmutableList.<CoreProvider>of
+			(
+				new LiteLoaderCoreProviderClient(this.properties),
+				LiteLoader.getInput()
+			);
+	}
 
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.api.LiteAPI#getInterfaceProviders()
-     */
-    @Override
-    public List<InterfaceProvider> getInterfaceProviders()
-    {
-        ObjectFactory<?, ?> objectFactory = this.getObjectFactory();
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.api.LiteAPI#getInterfaceProviders()
+	 */
+	@Override
+	public List<InterfaceProvider> getInterfaceProviders() {
+		ObjectFactory<?, ?> objectFactory = this.getObjectFactory();
 
-        return ImmutableList.<InterfaceProvider>of
-        (
-            objectFactory.getEventBroker(),
-            objectFactory.getPacketEventBroker(),
-            objectFactory.getClientPluginChannels(),
-            objectFactory.getServerPluginChannels(),
-            MessageBus.getInstance()
-        );
-    }
+		return ImmutableList.<InterfaceProvider>of
+			(
+				objectFactory.getEventBroker(),
+				objectFactory.getPacketEventBroker(),
+				objectFactory.getClientPluginChannels(),
+				objectFactory.getServerPluginChannels(),
+				MessageBus.getInstance()
+			);
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.api.LiteAPI#getPreInitObservers()
-     */
-    @Override
-    public List<Observer> getPreInitObservers()
-    {
-        return ImmutableList.<Observer>of
-        (
-            new ModEvents()
-        );
-    }
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.api.LiteAPI#getPreInitObservers()
+	 */
+	@Override
+	public List<Observer> getPreInitObservers() {
+		return ImmutableList.<Observer>of
+			(
+				new ModEvents()
+			);
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.api.LiteAPI#getObservers()
-     */
-    @Override
-    public List<Observer> getObservers()
-    {
-        ObjectFactory<?, ?> objectFactory = this.getObjectFactory();
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.api.LiteAPI#getObservers()
+	 */
+	@Override
+	public List<Observer> getObservers() {
+		ObjectFactory<?, ?> objectFactory = this.getObjectFactory();
 
-        return ImmutableList.<Observer>of
-        (
-            new ResourceObserver(),
-            objectFactory.getPanelManager(),
-            objectFactory.getEventBroker()
-        );
-    }
+		return ImmutableList.<Observer>of
+			(
+				new ResourceObserver(),
+				objectFactory.getPanelManager(),
+				objectFactory.getEventBroker()
+			);
+	}
 
-    /* (non-Javadoc)
-     * @see com.mumfrey.liteloader.core.api.LiteLoaderCoreAPI#getObjectFactory()
-     */
-    @Override
-    public ObjectFactory<?, ?> getObjectFactory()
-    {
-        if (this.objectFactory == null)
-        {
-            this.objectFactory = new ObjectFactoryClient(this.environment, this.properties);
-        }
+	/* (non-Javadoc)
+	 * @see com.mumfrey.liteloader.core.api.LiteLoaderCoreAPI#getObjectFactory()
+	 */
+	@Override
+	public ObjectFactory<?, ?> getObjectFactory() {
+		if (this.objectFactory == null) {
+			this.objectFactory = new ObjectFactoryClient(this.environment, this.properties);
+		}
 
-        return this.objectFactory;
-    }
+		return this.objectFactory;
+	}
 }

@@ -17,18 +17,17 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Session;
 
 @Mixin(Session.class)
-public abstract class MixinSession
-{
-    @Shadow public abstract String getUsername();
+public abstract class MixinSession {
+	@Shadow
+	public abstract String getUsername();
 
-    @Inject(method = "getProfile()Lcom/mojang/authlib/GameProfile;", cancellable = true, at = @At(
-        value = "NEW",
-        target = "com/mojang/authlib/GameProfile",
-        ordinal = 1,
-        remap = false
-    ))
-    private void generateGameProfile(CallbackInfoReturnable<GameProfile> ci)
-    {
-        ci.setReturnValue(new GameProfile(EntityPlayer.getOfflineUUID(this.getUsername()), this.getUsername()));
-    }
+	@Inject(method = "getProfile()Lcom/mojang/authlib/GameProfile;", cancellable = true, at = @At(
+		value = "NEW",
+		target = "com/mojang/authlib/GameProfile",
+		ordinal = 1,
+		remap = false
+	))
+	private void generateGameProfile(CallbackInfoReturnable<GameProfile> ci) {
+		ci.setReturnValue(new GameProfile(EntityPlayer.getOfflineUUID(this.getUsername()), this.getUsername()));
+	}
 }

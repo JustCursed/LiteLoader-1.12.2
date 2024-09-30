@@ -1,25 +1,20 @@
 package com.mumfrey.webprefs.exceptions;
 
-public class InvalidPreferenceOperationException extends RuntimeException
-{
-    private static final long serialVersionUID = 1L;
-    
-    public InvalidPreferenceOperationException()
-    {
-    }
+public class InvalidPreferenceOperationException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-    public InvalidPreferenceOperationException(String message)
-    {
-        super(message);
-    }
+	public InvalidPreferenceOperationException() {
+	}
 
-    public InvalidPreferenceOperationException(Throwable cause)
-    {
-        super(cause);
-    }
+	public InvalidPreferenceOperationException(String message) {
+		super(message);
+	}
 
-    public InvalidPreferenceOperationException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+	public InvalidPreferenceOperationException(Throwable cause) {
+		super(cause);
+	}
+
+	public InvalidPreferenceOperationException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

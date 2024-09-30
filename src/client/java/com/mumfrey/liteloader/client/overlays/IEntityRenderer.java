@@ -12,19 +12,20 @@ import net.minecraft.util.ResourceLocation;
  *
  * @author Adam Mummery-Smith
  */
-public interface IEntityRenderer
-{
-    public abstract boolean getUseShader();
-    public abstract void setUseShader(boolean useShader);
+public interface IEntityRenderer {
+	public abstract boolean getUseShader();
 
-    public abstract ResourceLocation[] getShaders();
+	public abstract void setUseShader(boolean useShader);
 
-    public abstract int getShaderIndex();
-    public abstract void setShaderIndex(int shaderIndex);
+	public abstract ResourceLocation[] getShaders();
 
-    public abstract void selectShader(ResourceLocation shader);
+	public abstract int getShaderIndex();
 
-    public abstract float getFOV(float partialTicks, boolean armFOV);
+	public abstract void setShaderIndex(int shaderIndex);
 
-    public abstract void setupCamera(float partialTicks, int pass);
+	public abstract void selectShader(ResourceLocation shader);
+
+	public abstract float getFOV(float partialTicks, boolean armFOV);
+
+	public abstract void setupCamera(float partialTicks, int pass);
 }

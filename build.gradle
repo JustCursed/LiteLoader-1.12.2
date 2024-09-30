@@ -1,17 +1,24 @@
 buildscript {
 	repositories {
-		mavenLocal()
-		mavenCentral()
 		maven { url = 'https://maven.minecraftforge.net' }
-		maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+		maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
+		maven { url = 'https://maven.outlands.top/releases' }
+		mavenCentral()
+		gradlePluginPortal()
 	}
 	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-		classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
+		classpath "net.kyori:blossom:2.1.0"
+		classpath "org.spongepowered:mixingradle:0.7.+"
+		classpath 'com.github.johnrengelman:shadow:8.1.1'
 	}
 }
-
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+apply plugin: 'java'
+apply plugin: 'net.kyori.blossom'
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'org.spongepowered.mixin'
 
 configurations {
@@ -79,27 +86,40 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
+	maven {
+		name 'Cleanroom Maven'
+		url 'https://maven.cleanroommc.com/'
+	}
 	mavenCentral()
-	mavenLocal()
-	maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-	maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-	flatDir { dirs 'lib' }
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
-	implementation fileTree(include: ['*.jar'], excludes: ['*-sources.jar'], dir: 'lib')
+	minecraft "net.minecraftforge:forge:1.12.2-14.23.5.2860"
+//	implementation fileTree(include: ['*.jar'], excludes: ['*-sources.jar'], dir: 'lib')
 
-	implementation('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
-		exclude module: 'asm-commons'
-		exclude module: 'asm-tree'
-		exclude module: 'launchwrapper'
-		exclude module: 'guava'
-		exclude module: 'log4j-core'
+//	shadow 'net.sf.jazzy:jazzy:0.5.2-rtext-1.4.1-2'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+
+	// Common:
+	annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
+	annotationProcessor 'com.google.guava:guava:32.1.2-jre'
+	annotationProcessor 'com.google.code.gson:gson:2.8.9'
+
+	clientAnnotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
+	clientAnnotationProcessor 'com.google.guava:guava:32.1.2-jre'
+	clientAnnotationProcessor 'com.google.code.gson:gson:2.8.9'
+
+	// ForgeGradle:
+	implementation ('zone.rong:mixinbooter:8.9') {
+		transitive = false
+	}
+	annotationProcessor ('zone.rong:mixinbooter:8.9') {
+		transitive = false
 	}
 
-	annotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
-	clientAnnotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
+	clientAnnotationProcessor ('zone.rong:mixinbooter:8.9') {
+		transitive = false
+	}
 }
 
 sourceSets {
@@ -172,19 +192,19 @@ jar {
 	manifest jarManifest
 }
 
-tasks.register('releaseJar', Jar) {
-	from sourceSets.main.output
-	from sourceSets.client.output
+//tasks.register('releaseJar', Jar) {
+//	from sourceSets.main.output
+//	from sourceSets.client.output
+//
+//	manifest jarManifest
+//	classifier = 'staging'
+//}
 
-	manifest jarManifest
-	classifier = 'staging'
-}
-
-tasks.register('javadocJar', Jar) {
-	dependsOn javadoc
-	from javadoc.destinationDir
-	classifier = 'javadoc'
-}
+//tasks.register('javadocJar', Jar) {
+//	dependsOn javadoc
+//	from javadoc.destinationDir
+////	classifier = 'javadoc'
+//}
 
 tasks.withType(JavaCompile) {
 	options.compilerArgs += [
@@ -206,5 +226,5 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 artifacts {
 	archives jar
-	archives javadocJar
+//	archives javadocJar
 }

@@ -15,15 +15,14 @@ import net.minecraft.client.audio.SoundList;
 import net.minecraft.util.ResourceLocation;
 
 @Mixin(SoundHandler.class)
-public abstract class MixinSoundHandler implements ISoundHandler
-{
-    
-    @Shadow abstract void loadSoundResource(ResourceLocation location, SoundList sounds);
-    
-    @Override
-    public void addSound(ResourceLocation sound, SoundList soundList)
-    {
-        this.loadSoundResource(sound, soundList);
-    }
-    
+public abstract class MixinSoundHandler implements ISoundHandler {
+
+	@Shadow
+	abstract void loadSoundResource(ResourceLocation location, SoundList sounds);
+
+	@Override
+	public void addSound(ResourceLocation sound, SoundList soundList) {
+		this.loadSoundResource(sound, soundList);
+	}
+
 }

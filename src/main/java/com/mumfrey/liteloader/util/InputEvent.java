@@ -6,8 +6,8 @@
 package com.mumfrey.liteloader.util;
 
 import net.java.games.input.Component;
-import net.java.games.input.Controller;
 import net.java.games.input.Event;
+import net.java.games.input.Controller;
 
 /**
  * A handle to an input event, this handle will be used to call back the handler

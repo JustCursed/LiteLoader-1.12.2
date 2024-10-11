@@ -2,23 +2,16 @@ buildscript {
 	repositories {
 		maven { url = 'https://maven.minecraftforge.net' }
 		maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
-		maven { url = 'https://maven.outlands.top/releases' }
 		mavenCentral()
 		gradlePluginPortal()
 	}
 	dependencies {
 		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
-		classpath "net.kyori:blossom:2.1.0"
-		classpath "org.spongepowered:mixingradle:0.7.+"
-		classpath 'com.github.johnrengelman:shadow:8.1.1'
+		classpath 'org.spongepowered:mixingradle:0.7.+'
 	}
 }
+
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'java'
-apply plugin: 'net.kyori.blossom'
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'org.spongepowered.mixin'
 
 configurations {
@@ -64,11 +57,11 @@ minecraft {
 }
 
 ext {
-	def isJenkins = project.hasProperty("jenkins")
+	def isJenkins = project.hasProperty('jenkins')
 
-	buildVersion = project.hasProperty("buildVersion") ? buildVersion : '0.0'
+	buildVersion = project.hasProperty('buildVersion') ? buildVersion : '0.0'
 	isReleaseBuild = true
-	brand = isJenkins ? "${project.mcVersion}-SNAPSHOT-r${System.env.GIT_COMMIT.take(7).toUpperCase()}-b${System.env.BUILD_NUMBER}-${System.env.BUILD_ID}" : ""
+	brand = isJenkins ? "${project.mcVersion}-SNAPSHOT-r${System.env.GIT_COMMIT.take(7).toUpperCase()}-b${System.env.BUILD_NUMBER}-${System.env.BUILD_ID}" : ''
 
 	projectName = 'LiteLoader'
 	inceptionYear = '2012'
@@ -78,29 +71,27 @@ ext {
 	tweakClass = 'com.mumfrey.liteloader.launch.LiteLoaderTweaker'
 }
 
-group = "com.mumfrey"
-archivesBaseName = "liteloader"
+group = 'com.mumfrey'
+archivesBaseName = 'liteloader'
 version = buildVersion
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
 repositories {
+	mavenLocal()
+	mavenCentral()
 	maven {
 		name 'Cleanroom Maven'
 		url 'https://maven.cleanroommc.com/'
 	}
-	mavenCentral()
+
+	maven {
+		url "https://maven.outlands.top/releases/"
+	}
 }
 
 dependencies {
-	minecraft "net.minecraftforge:forge:1.12.2-14.23.5.2860"
-//	implementation fileTree(include: ['*.jar'], excludes: ['*-sources.jar'], dir: 'lib')
+	minecraft('net.minecraftforge:forge:1.12.2-14.23.5.2860')
+	implementation "top.outlands:foundation:0.13.11"
 
-//	shadow 'net.sf.jazzy:jazzy:0.5.2-rtext-1.4.1-2'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
-
-	// Common:
 	annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
 	annotationProcessor 'com.google.guava:guava:32.1.2-jre'
 	annotationProcessor 'com.google.code.gson:gson:2.8.9'
@@ -109,7 +100,6 @@ dependencies {
 	clientAnnotationProcessor 'com.google.guava:guava:32.1.2-jre'
 	clientAnnotationProcessor 'com.google.code.gson:gson:2.8.9'
 
-	// ForgeGradle:
 	implementation ('zone.rong:mixinbooter:8.9') {
 		transitive = false
 	}
@@ -124,11 +114,11 @@ dependencies {
 
 sourceSets {
 	main {
-		ext.refMap = "mixins.liteloader.core.refmap.json"
+		ext.refMap = 'mixins.liteloader.core.refmap.json'
 	}
 	client {
 		compileClasspath += main.compileClasspath + main.output
-		ext.refMap = "mixins.liteloader.client.refmap.json"
+		ext.refMap = 'mixins.liteloader.client.refmap.json'
 	}
 	debug {
 		compileClasspath += client.compileClasspath + client.output
@@ -154,24 +144,23 @@ afterEvaluate {
 	logger.lifecycle '================================================='
 	logger.lifecycle '  LiteLoader'
 	logger.lifecycle '  Copyright (C) 2011-2017 Adam Mummery-Smith'
-	logger.lifecycle '  Running in {} mode', (project.isReleaseBuild ? "RELEASE" : "SNAPSHOT")
+	logger.lifecycle '  Running in {} mode', (project.isReleaseBuild ? 'RELEASE' : 'SNAPSHOT')
 	logger.lifecycle '================================================='
 }
 
 processResources {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	inputs.property "brand", project.brand
+	inputs.property 'brand', project.brand
 	from (sourceSets.main.resources.srcDirs) {
 		include 'liteloader.properties'
 		filter { line -> line.startsWith('brand=') ? line + project.brand : line }
 	}
 }
 
-// manifest entries for all jars
 def jarManifest = {
 	attributes (
 		'Built-By': System.properties['user.name'],
-		'Created-By': System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+		'Created-By': "${System.properties['java.vm.version']} (${System.properties['java.vm.vendor']})",
 		'Implementation-Title': name,
 		'Implementation-Version': version,
 		'Implementation-Vendor': url,
@@ -187,44 +176,25 @@ jar {
 			value: "initializeConnectionToPlayer(Lnet/minecraft/network/NetworkManager;Lnet/minecraft/entity/player/EntityPlayerMP;Lnet/minecraft/network/NetHandlerPlayServer;)V"
 		)
 	}
+
 	from sourceSets.client.output
 	from sourceSets.debug.output
 	manifest jarManifest
 }
 
-//tasks.register('releaseJar', Jar) {
-//	from sourceSets.main.output
-//	from sourceSets.client.output
-//
-//	manifest jarManifest
-//	classifier = 'staging'
-//}
+tasks.withType(JavaCompile).configureEach {
+	options.deprecation = true
+	options.encoding = 'utf8'
+	options.release = 21
 
-//tasks.register('javadocJar', Jar) {
-//	dependsOn javadoc
-//	from javadoc.destinationDir
-////	classifier = 'javadoc'
-//}
-
-tasks.withType(JavaCompile) {
 	options.compilerArgs += [
 		'-Xlint:all',
 		'-Xlint:-path',
 		'-Xlint:-rawtypes',
 		'-Xlint:-processing'
 	]
-	options.deprecation = true
-	options.encoding = 'utf8'
-}
-
-if (JavaVersion.current().isJava8Compatible()) {
-	tasks.withType(Javadoc) {
-		// disable the crazy super-strict doclint tool in Java 8
-		options.addStringOption('Xdoclint:none', '-quiet')
-	}
 }
 
 artifacts {
 	archives jar
-//	archives javadocJar
 }

@@ -7,8 +7,9 @@ package com.mumfrey.liteloader.util.jinput;
 
 import com.mumfrey.liteloader.util.log.LiteLoaderLogger;
 import net.java.games.input.Component;
-import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Controller;
+import org.lwjgl.util.jinput.LWJGLEnvironmentPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,9 +41,9 @@ public class ComponentRegistry {
 	public void enumerate() {
 		try {
 			LiteLoaderLogger.info("JInput Component Registry is initialising...");
-			this.enumerate(ControllerEnvironment.getDefaultEnvironment());
+			this.enumerate(LWJGLEnvironmentPlugin.getDefaultEnvironment());
 			LiteLoaderLogger.info("JInput Component Registry initialised, found %d controller(s) %d component(s)",
-				ControllerEnvironment.getDefaultEnvironment().getControllers().length, components.size());
+				LWJGLEnvironmentPlugin.getDefaultEnvironment().getControllers().length, components.size());
 		} catch (Throwable th) {
 		}
 	}

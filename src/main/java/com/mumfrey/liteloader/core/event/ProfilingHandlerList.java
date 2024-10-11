@@ -14,6 +14,7 @@ import org.objectweb.asm.tree.*;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,6 +39,14 @@ public class ProfilingHandlerList<T extends Listener> extends HandlerList<T> {
 	public ProfilingHandlerList(Class<T> type, Profiler profiler) {
 		super(type);
 		this.profiler = profiler;
+
+
+		System.out.println("VAGINAAAAA");
+		System.out.println(this.profiler);
+		System.out.println(this.profiler.profilingEnabled);
+		System.out.println(Arrays.toString(this.profiler.getClass().getDeclaredClasses()));
+		System.out.println(Arrays.toString(this.profiler.getClass().getDeclaredConstructors()));
+		System.out.println("XYYYYYYYYI");
 	}
 
 	/**
@@ -112,6 +121,14 @@ public class ProfilingHandlerList<T extends Listener> extends HandlerList<T> {
 		@Override
 		public BakedHandlerList<T> createInstance(Class<BakedHandlerList<T>> handlerClass) throws Exception {
 			try {
+
+				System.out.println("PIZDAAAAAAAAA");
+				System.out.println(this.profiler.getClass().getCanonicalName());
+				System.out.println(this.profiler.profilingEnabled);
+				System.out.println(handlerClass.getDeclaredConstructor(Profiler.class));
+				System.out.println(handlerClass.getDeclaredConstructor(Profiler.class).getName());
+				System.out.println(handlerClass.getDeclaredConstructor(Profiler.class).getDeclaringClass());
+				System.out.println("ESHKEREEEEEEE");
 				Constructor<BakedHandlerList<T>> ctor = handlerClass.getDeclaredConstructor(Profiler.class);
 				ctor.setAccessible(true);
 				return ctor.newInstance(this.profiler);

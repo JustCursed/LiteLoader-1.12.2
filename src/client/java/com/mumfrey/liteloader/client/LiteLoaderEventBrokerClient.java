@@ -95,8 +95,11 @@ public class LiteLoaderEventBrokerClient extends LiteLoaderEventBroker<Minecraft
 
 		LiteLoaderEventBrokerClient.instance = this;
 
-		this.engineClient = (GameEngineClient) engine;
-		this.tickListeners = new ProfilingHandlerList<Tickable>(Tickable.class, this.engineClient.getProfiler());
+		this.engineClient = engine;
+
+		// I'll just hope it's not necessary
+		// this.tickListeners = new ProfilingHandlerList<Tickable>(Tickable.class, this.engineClient.getProfiler());
+		this.tickListeners = new HandlerList<>(Tickable.class);
 	}
 
 	public static LiteLoaderEventBrokerClient getInstance() {

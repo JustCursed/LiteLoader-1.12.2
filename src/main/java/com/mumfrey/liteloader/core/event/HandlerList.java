@@ -80,11 +80,11 @@ public class HandlerList<T> extends LinkedList<T> implements FastIterableDeque<T
 
 		private final boolean assumeTrue;
 
-		private ReturnLogicOp(boolean isOr, boolean breakOnMatch) {
+		ReturnLogicOp(boolean isOr, boolean breakOnMatch) {
 			this(isOr, breakOnMatch, false);
 		}
 
-		private ReturnLogicOp(boolean isOr, boolean breakOnMatch, boolean assumeTrue) {
+		ReturnLogicOp(boolean isOr, boolean breakOnMatch, boolean assumeTrue) {
 			this.isOr = isOr;
 			this.breakOnMatch = breakOnMatch;
 			this.assumeTrue = assumeTrue;
@@ -122,7 +122,7 @@ public class HandlerList<T> extends LinkedList<T> implements FastIterableDeque<T
 	/**
 	 * True to sort the list when baking
 	 */
-	private boolean sorted = true;
+	private boolean sorted;
 
 	/**
 	 * @param type
@@ -185,8 +185,8 @@ public class HandlerList<T> extends LinkedList<T> implements FastIterableDeque<T
 		Arrays.sort(sortable);
 
 		List<T> sortedList = new ArrayList<T>(this.size());
-		for (int s = 0; s < sortable.length; s++) {
-			sortedList.add(sortable[s].getValue());
+		for (SortableValue<T> tSortableValue : sortable) {
+			sortedList.add(tSortableValue.getValue());
 		}
 
 		return sortedList;
@@ -571,7 +571,7 @@ public class HandlerList<T> extends LinkedList<T> implements FastIterableDeque<T
 				this.decorator.prepare(sortedList);
 			}
 
-			Class<BakedHandlerList<T>> handlerClass = null;
+			Class<BakedHandlerList<T>> handlerClass;
 
 			try {
 				// Inflect the class name and attempt to generate the class

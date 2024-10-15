@@ -1,7 +1,7 @@
 buildscript {
 	repositories {
-		maven { url = 'https://maven.minecraftforge.net' }
-		maven { url = 'https://repo.spongepowered.org/repository/maven-public' }
+		maven { url 'https://maven.minecraftforge.net' }
+		maven { url 'https://repo.spongepowered.org/repository/maven-public' }
 		mavenCentral()
 		gradlePluginPortal()
 	}
@@ -13,6 +13,12 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
+
+def coreMixin = 'mixins.liteloader.core.json'
+def coreRefMap = 'mixins.liteloader.core.refmap.json'
+
+def clientMixin = 'mixins.liteloader.client.json'
+def clientRefMap = 'mixins.liteloader.client.refmap.json'
 
 configurations {
 	embed
@@ -29,8 +35,8 @@ minecraft {
 			property 'forge.logging.markers', 'REGISTRIES'
 			property 'forge.logging.console.level', 'debug'
 			args += ['--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker',
-					'--mixin', 'mixins.liteloader.core.json',
-					'--mixin', 'mixins.liteloader.client.json']
+					'--mixin', coreMixin,
+					'--mixin', clientMixin]
 
 			mods {
 				sanctum {
@@ -44,7 +50,7 @@ minecraft {
 			property 'forge.logging.markers', 'REGISTRIES'
 			property 'forge.logging.console.level', 'debug'
 			args += ['--tweakClass', 'org.spongepowered.asm.launch.MixinTweaker',
-					'--mixin', 'mixins.liteloader.core.json',
+					'--mixin', coreMixin,
 					'nogui']
 
 			mods {
@@ -79,8 +85,7 @@ repositories {
 	mavenLocal()
 	mavenCentral()
 	maven {
-		name 'Cleanroom Maven'
-		url 'https://maven.cleanroommc.com/'
+		url 'https://repo.spongepowered.org/repository/maven-public/'
 	}
 
 	maven {
@@ -89,36 +94,24 @@ repositories {
 }
 
 dependencies {
-	minecraft('net.minecraftforge:forge:1.12.2-14.23.5.2860')
-	implementation "top.outlands:foundation:0.13.11"
+	minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+	compileOnly fileTree(include: ['*.jar'], dir: 'lib')
+	implementation 'top.outlands:foundation:0.13.11'
+	implementation 'org.spongepowered:mixin:0.8.7'
 
-	annotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
-	annotationProcessor 'com.google.guava:guava:32.1.2-jre'
-	annotationProcessor 'com.google.code.gson:gson:2.8.9'
-
-	clientAnnotationProcessor 'org.ow2.asm:asm-debug-all:5.2'
-	clientAnnotationProcessor 'com.google.guava:guava:32.1.2-jre'
-	clientAnnotationProcessor 'com.google.code.gson:gson:2.8.9'
-
-	implementation ('zone.rong:mixinbooter:8.9') {
-		transitive = false
-	}
-	annotationProcessor ('zone.rong:mixinbooter:8.9') {
-		transitive = false
-	}
-
-	clientAnnotationProcessor ('zone.rong:mixinbooter:8.9') {
-		transitive = false
-	}
+	annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+	clientAnnotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 }
 
 sourceSets {
 	main {
-		ext.refMap = 'mixins.liteloader.core.refmap.json'
+		ext.refMap = coreRefMap
+		resources.srcDir 'src/generated/resources'
 	}
 	client {
 		compileClasspath += main.compileClasspath + main.output
-		ext.refMap = 'mixins.liteloader.client.refmap.json'
+		resources.srcDir 'src/generated/resources'
+		ext.refMap = clientRefMap
 	}
 	debug {
 		compileClasspath += client.compileClasspath + client.output
@@ -126,19 +119,16 @@ sourceSets {
 }
 
 mixin {
-	add sourceSets.main, 'mixins.liteloader.core.refmap.json'
-	add sourceSets.client, 'mixins.liteloader.client.refmap.json'
+	add sourceSets.main, coreRefMap
+	add sourceSets.client, clientRefMap
 
-	config 'mixins.liteloader.core.json'
-	config 'mixins.liteloader.client.json'
+	config coreMixin
+	config clientMixin
 }
 
 compileClientJava {
 	options.annotationProcessorPath = configurations.clientAnnotationProcessor
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }
-sourceSets.client.resources { srcDir 'src/generated/resources' }
 
 afterEvaluate {
 	logger.lifecycle '================================================='
